@@ -15,13 +15,17 @@ public class Actor {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthdate;
 
-    public Actor(String lauri, String date) {
-
+    public Actor(String name, String birthdate) { //constructor for string
+        this.name = name;
+        this.birthdate = LocalDate.parse(birthdate);
     }
-
-    public Actor(String name, LocalDate birthdate) {
+    public Actor(String name, LocalDate birthdate) { //Constructor for localdate
         this.name = name;
         this.birthdate = birthdate;
+    }
+
+    public Actor() {
+
     }
 
     public void setId(Long id) {

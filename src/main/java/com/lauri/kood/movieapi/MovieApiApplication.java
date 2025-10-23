@@ -2,8 +2,10 @@ package com.lauri.kood.movieapi;
 
 import com.lauri.kood.movieapi.entity.Actor;
 import com.lauri.kood.movieapi.repository.ActorRepository;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDate;
 
@@ -12,6 +14,16 @@ public class MovieApiApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(MovieApiApplication.class, args);
+    }
+
+    @Bean
+    public CommandLineRunner run(ActorRepository repository) {
+        return (args -> {
+            insertJavaAdvocates(repository);
+            System.out.println(repository.findAll());
+            System.out.println("DB absolute path: " + new java.io.File("movie.db").getAbsolutePath());
+
+        });
     }
 
     private void insertJavaAdvocates(ActorRepository repository) {
