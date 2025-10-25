@@ -17,11 +17,13 @@ public class MovieApiApplication {
     }
 
     @Bean
-    public CommandLineRunner run(ActorRepository repository) {
+    public CommandLineRunner run(ActorRepository repository) { //returns
         return (args -> {
-            insertJavaAdvocates(repository);
-            System.out.println(repository.findAll());
-            System.out.println("DB absolute path: " + new java.io.File("movie.db").getAbsolutePath());
+//            insertJavaAdvocates(repository);
+//            System.out.println(repository.findAll());
+//            System.out.println("DB absolute path: " + new java.io.File("movie.db").getAbsolutePath());
+            System.out.println(repository.findActorByName("Lauri"));
+            System.out.println();
 
         });
     }
