@@ -9,6 +9,7 @@ public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false) //makes name field not nullable(cant be left empty)
     private String title;
     private String releaseYear;
     private String duration;

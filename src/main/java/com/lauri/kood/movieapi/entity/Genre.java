@@ -1,6 +1,8 @@
 package com.lauri.kood.movieapi.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 
 import java.util.List;
 
@@ -9,6 +11,9 @@ public class Genre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false) //makes name field not nullable(cant be left empty) on the database level
+    @NotBlank(message = "Name must not be empty")
     private String name;
 
     public Genre(String name) {

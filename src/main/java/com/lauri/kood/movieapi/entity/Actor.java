@@ -11,6 +11,7 @@ public class Actor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false) //makes name field not nullable(cant be left empty)
     private String name;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthdate;
