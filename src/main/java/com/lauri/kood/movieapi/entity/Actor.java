@@ -20,6 +20,7 @@ public class Actor {
         this.name = name;
         this.birthdate = LocalDate.parse(birthdate);
     }
+
     public Actor(String name, LocalDate birthdate) { //Constructor for localdate
         this.name = name;
         this.birthdate = birthdate;
@@ -27,6 +28,10 @@ public class Actor {
 
     public Actor() {
 
+    }
+
+    public LocalDate getBirthdate() {
+        return birthdate;
     }
 
     public void setId(Long id) {

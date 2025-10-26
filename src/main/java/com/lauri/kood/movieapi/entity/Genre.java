@@ -2,6 +2,7 @@ package com.lauri.kood.movieapi.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+
 import java.util.List;
 
 import java.util.List;

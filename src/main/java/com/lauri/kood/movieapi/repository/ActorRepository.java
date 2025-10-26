@@ -8,6 +8,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface ActorRepository extends JpaRepository<Actor, Long> {
-    List<Actor> findActorByName(String name);
-    List<Actor> findActorByBirthdate(LocalDate birthdate);
+    //List<Actor> findActorByName(String name);
+    //List<Actor> findActorByBirthdate(LocalDate birthdate);
 }

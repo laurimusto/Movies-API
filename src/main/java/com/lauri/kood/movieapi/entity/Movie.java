@@ -14,6 +14,12 @@ public class Movie {
     private String releaseYear;
     private String duration;
 
+    public Movie(String title, String releaseYear, String duration) {
+        this.title = title;
+        this.releaseYear = releaseYear;
+        this.duration = duration;
+    }
+
     public String getReleaseYear() {
         return releaseYear;
     }
