@@ -1,0 +1,55 @@
+package com.movieapi.kmdb.controllers;
+
+import com.movieapi.kmdb.dtos.ActorPatchDto;
+import com.movieapi.kmdb.dtos.ActorResponseDto;
+import com.movieapi.kmdb.dtos.MovieFlatDto;
+import com.movieapi.kmdb.service.ActorService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Set;
+
+@RestController
+@RequestMapping(value = "/api/actors", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequiredArgsConstructor
+public class ActorController {
+    private final ActorService service;
+
+    @PostMapping
+    public ActorResponseDto create(@Validated @RequestBody ActorPatchDto actorDto) {
+        return service.create(actorDto);
+    }
+
+    @GetMapping
+    public List<ActorResponseDto> getAll(){
+        return service.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public ActorResponseDto get(@PathVariable Long id){
+        return service.getById(id);
+    }
+
+    @GetMapping("/{id}/movies")
+    public Set<MovieFlatDto> getMovies(@PathVariable Long id){
+        return service.getMovies(id);
+    }
+
+    @GetMapping("/search")
+    public List<ActorResponseDto> searchByName(@RequestParam String name){
+        return service.getName(name);
+    }
+
+    @PatchMapping("/{id}")
+    public ActorResponseDto update(@PathVariable Long id, @Validated @RequestBody ActorPatchDto actorDto){
+        return service.update(id, actorDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id, @RequestParam(defaultValue = "false") boolean force){
+        service.delete(id, force);
+    }
+}
