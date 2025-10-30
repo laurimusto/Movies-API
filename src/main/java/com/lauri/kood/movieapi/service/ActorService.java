@@ -1,5 +1,6 @@
 package com.lauri.kood.movieapi.service;
 
+import com.lauri.kood.movieapi.dto.ActorPatchDTO;
 import com.lauri.kood.movieapi.dto.ActorResponseDTO;
 import com.lauri.kood.movieapi.dto.ActorRequestDTO;
 import com.lauri.kood.movieapi.entity.Actor;
@@ -40,13 +41,13 @@ public class ActorService {
     private ActorResponseDTO toResponse(Actor actor) {
         return new ActorResponseDTO(actor.getId(), actor.getName(), actor.getBirthdate());
     }
-
-    public ActorResponseDTO create(ActorRequestDTO request) { //create an actor with name and birthdate
+    //create an actor with name and birthdate and return it to controller
+    public ActorResponseDTO create(ActorPatchDTO actorDTO) {
         Actor actor = new Actor();
-        actor.setName(request.name());
-        actor.setBirthdate(LocalDate.parse(request.birthdate()));
-        Actor saved = actorRepository.save(actor);
-        return toResponse(saved);
+        actor.setName(actorDTO.name());
+        actor.setBirthdate(actorDTO.birthdate());
+        Actor savedActor = actorRepository.save(actor);
+        return toResponse(savedActor);
     }
 
     public List<ActorResponseDTO> getAll() {
@@ -61,6 +62,11 @@ public class ActorService {
         return toResponse(actor);
     }
 
-
+    public List<ActorResponseDTO> filterByName(String name) {
+        return actorRepository.findByNameContainingIgnoreCase(name)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
 
 }

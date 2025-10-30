@@ -1,5 +1,7 @@
 package com.lauri.kood.movieapi.controller;
 
+import com.lauri.kood.movieapi.dto.ActorPatchDTO;
+import com.lauri.kood.movieapi.dto.ActorRequestDTO;
 import com.lauri.kood.movieapi.dto.ActorResponseDTO;
 import com.lauri.kood.movieapi.entity.Actor;
 import com.lauri.kood.movieapi.service.ActorService;
@@ -14,30 +16,36 @@ import org.springframework.web.bind.annotation.*;
 
  */
 import java.util.List;
+
 @RequestMapping(value = "/api/actors", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class ActorController {
 
-    private final ActorService service;
+    private final ActorService actorService;
 
     @Autowired
     public ActorController(ActorService actorService) {
-        this.service = actorService;
+        this.actorService = actorService;
     }
 
     @GetMapping
-    List<ActorResponseDTO> All() {
-        return service.getAll();
+    public List<ActorResponseDTO> getAll() {
+        return actorService.getAll();
     }
 
     @GetMapping("/{id}")
-    public ActorResponseDTO get(@PathVariable Long id) {
-        return service.findById(id);
+    public ActorResponseDTO getId(@PathVariable Long id) {
+        return actorService.findById(id);
     }
 
     @PostMapping
-    public ActorResponseDTO create(@RequestBody @Validated Actor actor) {
-        return service.create(actor);
-    }
+    public ActorResponseDTO createActor(@RequestBody @Validated ActorPatchDTO actorDto) {
+      return actorService.create(actorDto);
+     }
+
+     //@GetMapping("/{name}")
+    //public ActorResponseDTO filterByName(@PathVariable String name) {
+       // return actorService.filterByName(name);
+     //}
 }
 

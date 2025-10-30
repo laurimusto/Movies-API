@@ -12,6 +12,7 @@ target/
 .settings
 .springBeans
 .sts4-cache
+application.properties
 
 ### IntelliJ IDEA ###
 .idea
@@ -70,3 +71,5 @@ desktop.ini
 *.db-shm
 *.db-wal
 *_cache=shared
+EvertActorService
+evertController
