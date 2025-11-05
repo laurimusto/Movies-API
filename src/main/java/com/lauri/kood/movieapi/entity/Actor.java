@@ -4,42 +4,42 @@ import jakarta.persistence.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 public class Actor {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false) //makes name field not nullable(cant be left empty)
+
+    @Column(nullable = false)
     private String name;
+
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthdate;
 
-    public Actor(String name, String birthdate) { //constructor for string
+    @ManyToMany(mappedBy = "actors")
+    private List<Movie> movies = new ArrayList<>();
+
+    public Actor() { }
+
+    public Actor(String name) {
         this.name = name;
-        this.birthdate = LocalDate.parse(birthdate);
     }
 
-    public Actor(String name, LocalDate birthdate) { //Constructor for localdate
+    public Actor(String name, LocalDate birthdate) {
         this.name = name;
         this.birthdate = birthdate;
     }
 
-    public Actor() {
-
-    }
-
-    public LocalDate getBirthdate() {
-        return birthdate;
+    public Long getId() {
+        return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getId() {
-        return id;
     }
 
     public String getName() {
@@ -50,20 +50,24 @@ public class Actor {
         this.name = name;
     }
 
+    public LocalDate getBirthdate() {
+        return birthdate;
+    }
+
     public void setBirthdate(LocalDate birthdate) {
         this.birthdate = birthdate;
+    }
+
+    public List<Movie> getMovies() {
+        return movies;
     }
 
     @Override
     public String toString() {
         return "Actor{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", birthdate=" + birthdate +
-                ", id=" + id +
                 '}';
     }
-
-    @ManyToMany(mappedBy = "actors")
-    private List<Movie> movies;
-
 }

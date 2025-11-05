@@ -5,6 +5,7 @@ import com.lauri.kood.movieapi.dto.ActorResponseDTO;
 import com.lauri.kood.movieapi.dto.ActorRequestDTO;
 import com.lauri.kood.movieapi.entity.Actor;
 import com.lauri.kood.movieapi.repository.ActorRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

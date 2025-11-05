@@ -3,26 +3,35 @@ package com.lauri.kood.movieapi.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
-import java.util.List;
-
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 public class Genre {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false) //makes name field not nullable(cant be left empty) on the database level
+    @Column(nullable = false)
     @NotBlank(message = "Name must not be empty")
     private String name;
+
+    @ManyToMany(mappedBy = "genres")
+    private List<Movie> movies = new ArrayList<>();
+
+    public Genre() { }
 
     public Genre(String name) {
         this.name = name;
     }
 
-    public Genre() {
+    public Long getId() {
+        return id;
+    }
 
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -33,17 +42,9 @@ public class Genre {
         this.name = name;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public List<Movie> getMovies() {
+        return movies;
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    @ManyToMany(mappedBy = "genres")
-    private List<Movie> movies;
-
 
     @Override
     public String toString() {
