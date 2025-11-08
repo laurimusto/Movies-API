@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface ActorRepository extends JpaRepository<Actor, Long> {
     List<Actor> findByNameContainingIgnoreCase(String name);
+
+    List<Actor> Id(Long id);
     //List<Actor> findActorByName(String name);
     //List<Actor> findActorByBirthdate(LocalDate birthdate);
 }

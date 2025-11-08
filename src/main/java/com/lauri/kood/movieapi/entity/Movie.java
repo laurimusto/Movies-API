@@ -14,11 +14,21 @@ public class Movie {
     private String releaseYear;
     private String duration;
 
-    public Movie(String title, String releaseYear, String duration) {
+    public Movie(String title, String releaseYear, String duration) { //Constructor for everything else.
         this.title = title;
         this.releaseYear = releaseYear;
         this.duration = duration;
     }
+
+    public Movie(String title, String releaseYear, String duration, //Constructor for seeding the database.
+                 List<Genre> genres, List<Actor> actors) {
+        this.title = title;
+        this.releaseYear = releaseYear;
+        this.duration = duration;
+        this.genres = genres;
+        this.actors = actors;
+    }
+
 
     public Movie() {
     }

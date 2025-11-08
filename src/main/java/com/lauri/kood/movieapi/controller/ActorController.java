@@ -28,24 +28,25 @@ public class ActorController {
         this.actorService = actorService;
     }
 
-    @GetMapping
+    @GetMapping //get every actor from database.
     public List<ActorResponseDTO> getAll() {
         return actorService.getAll();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}")//get Actor with corresponding ID from databse.
     public ActorResponseDTO getId(@PathVariable Long id) {
         return actorService.findById(id);
     }
+    
+    @GetMapping("/search") //Search for certain user in url using /search?name=Leonardo%20Dicaprio
+    public List<ActorResponseDTO> filterbyName(@PathVariable String name) {
+    return actorService.filterByName(name);
+    }
 
-    @PostMapping
+    @PostMapping //create a new listing in database with new ID
     public ActorResponseDTO createActor(@RequestBody @Validated ActorPatchDTO actorDto) {
       return actorService.create(actorDto);
-     }
+    }
 
-     //@GetMapping("/{name}")
-    //public ActorResponseDTO filterByName(@PathVariable String name) {
-       // return actorService.filterByName(name);
-     //}
 }
 

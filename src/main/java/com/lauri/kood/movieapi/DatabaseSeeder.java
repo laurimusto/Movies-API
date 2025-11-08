@@ -103,6 +103,6 @@ public class DatabaseSeeder {
 
         movieRepository.saveAll(movies);
 
-        System.out.println("✅ Database seeded successfully!");
+        System.out.println("✅ Sample Database seeded successfully!");
     }
 }

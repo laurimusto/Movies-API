@@ -1,27 +1,23 @@
 package com.lauri.kood.movieapi.service;
-
 import com.lauri.kood.movieapi.dto.ActorPatchDTO;
 import com.lauri.kood.movieapi.dto.ActorResponseDTO;
-import com.lauri.kood.movieapi.dto.ActorRequestDTO;
 import com.lauri.kood.movieapi.entity.Actor;
+import com.lauri.kood.movieapi.exceptions.ResourceNotFoundException;
 import com.lauri.kood.movieapi.repository.ActorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 /*
 Actor
 The actor service should handle adding new actors with their name and birth date.
 
     Implement methods to retrieve all actors,
     get a specific actor by ID, &&
-and filter actors by name.
+    and filter actors by name.
 You'll also need a way to fetch all movies an actor has appeared in.
 Lastly, ensure you can modify an existing actor's details
 (including their name,
- birth date,
+ birthdate,
 and associated movies)
 and remove an actor from the database.
 
@@ -51,23 +47,35 @@ public class ActorService {
         return toResponse(savedActor);
     }
 
-    public List<ActorResponseDTO> getAll() {
+    public List<ActorResponseDTO> getAll() { //get all actors in database, even if it is empty.
         return actorRepository.findAll()
                 .stream()
                 .map(actor -> new ActorResponseDTO(actor.getId(), actor.getName(), actor.getBirthdate()))
                 .toList();
     }
 
-    public ActorResponseDTO findById(Long id) { //find actor by specific ID
-        Actor actor = actorRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Actor with id " + id + " not found"));
+    public ActorResponseDTO findById(Long id) { //find actor by specific ID, else display error
+        Actor actor = actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Actor with id " + id + " not found"));
         return toResponse(actor);
     }
 
-    public List<ActorResponseDTO> filterByName(String name) {
-        return actorRepository.findByNameContainingIgnoreCase(name)
+    public List<ActorResponseDTO> filterByName(String name) { //search for certain name in URL, else display error.
+    List<Actor> list = actorRepository.findByNameContainingIgnoreCase(name);
+    if(list.isEmpty()) {
+        throw new ResourceNotFoundException("name " + name + " not found in database.");
+    } return list
                 .stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    public ActorResponseDTO patchName(Long id, ActorPatchDTO patch) {
+        Actor actor = actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Actor with id " + id + " not found"));
+        if(patch.name() != null) { actor.setName(patch.name()); }
+        if(patch.birthdate() != null) { actor.setBirthdate(patch.birthdate()); }
+        actorRepository.save(actor);
+
+        return toResponse(actor);
     }
 
 }
