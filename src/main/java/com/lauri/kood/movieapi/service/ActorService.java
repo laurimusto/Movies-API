@@ -47,19 +47,19 @@ public class ActorService {
         return toResponse(savedActor);
     }
 
-    public List<ActorResponseDTO> getAll() { //get all actors in database, even if it is empty.
+    public List<ActorResponseDTO> getAll() { //get all actors in a database, even if it is empty.
         return actorRepository.findAll()
                 .stream()
                 .map(actor -> new ActorResponseDTO(actor.getId(), actor.getName(), actor.getBirthdate()))
                 .toList();
     }
 
-    public ActorResponseDTO findById(Long id) { //find actor by specific ID, else display error
+    public ActorResponseDTO findById(Long id) { //find actor by specific ID, else display an error
         Actor actor = actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Actor with id " + id + " not found"));
         return toResponse(actor);
     }
 
-    public List<ActorResponseDTO> filterByName(String name) { //search for certain name in URL, else display error.
+    public List<ActorResponseDTO> filterByName(String name) { //search for a certain name in URL, else display an error.
     List<Actor> list = actorRepository.findByNameContainingIgnoreCase(name);
     if(list.isEmpty()) {
         throw new ResourceNotFoundException("name " + name + " not found in database.");

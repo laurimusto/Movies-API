@@ -29,6 +29,13 @@ public class Movie {
         this.actors = actors;
     }
 
+    public List<Actor> getActors() {
+        return actors;
+    }
+
+    public List<Genre> getGenres() {
+        return genres;
+    }
 
     public Movie() {
     }
@@ -72,11 +79,12 @@ public class Movie {
 
     @ManyToMany
     @JoinTable(
-            name = "movie_actor",
-            joinColumns = @JoinColumn(name = "movie_id"),
-            inverseJoinColumns = @JoinColumn(name = "actor_id")
+            name = "movie_actor",           // ← Join table name
+            joinColumns = @JoinColumn(name = "movie_id"),         // ← This entity's FK
+            inverseJoinColumns = @JoinColumn(name = "actor_id")   // ← Other entity's FK
     )
     private List<Actor> actors;
+
     @ManyToMany
     @JoinTable(
             name = "movie_genre",
