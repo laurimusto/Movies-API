@@ -1,6 +1,8 @@
 package com.lauri.kood.movieapi.entity;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,10 +20,15 @@ public class Genre {
     @ManyToMany(mappedBy = "genres")
     private List<Movie> movies = new ArrayList<>();
 
-    public Genre() { }
+    public Genre() {
+    }
 
     public Genre(String name) {
         this.name = name;
+    }
+
+    public set<Movie> getMovies() {
+        return movies;
     }
 
     public Long getId() {

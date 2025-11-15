@@ -1,8 +1,12 @@
 package com.lauri.kood.movieapi.service;
 
+import com.lauri.kood.movieapi.dto.ActorPatchDTO;
+import com.lauri.kood.movieapi.dto.GenrePatchDTO;
+import com.lauri.kood.movieapi.dto.GenreResponseDTO;
 import com.lauri.kood.movieapi.entity.Genre;
+import com.lauri.kood.movieapi.exceptions.ResourceNotFoundException;
 import com.lauri.kood.movieapi.repository.GenreRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,7 +22,7 @@ public class GenreService {
 
     public Genre create(Genre genre) {
         if (genre == null) {
-            return null;
+            throw new NullPointerException("genre can't be null");
         } else {
             return genreRepository.save(genre); //create new genre
         }
@@ -30,18 +34,28 @@ public class GenreService {
     }
 
     public Genre findById(Long id) {
-        return genreRepository.findById(id).orElse(null); //retrieve genre by id
+        return genreRepository.findById(id)
+                .orElseThrow(()
+                -> new ResourceNotFoundException("Can't find genre with " + id + " id") ); //retrieve genre by id
     }
 
-    public Genre update(Long id, String newName) {
-        Genre genre = genreRepository.findById(id).orElse(null);
-
-        if (genre == null) {
-            return null;
+    public GenreResponseDTO update(Long id, ActorPatchDTO newName) {
+        Genre genre = genreRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Can't add new name"));
+        if (newName.name() != null && !newName.name().isBlank()) {
+            genre.setName(newName.name());
         }
-        genre.setName(newName);
-        return genreRepository.save(genre);
 
+        genreRepository.save(genre);
+        return new GenreResponseDTO(genre.getId(), genre.getName());
+    }
+
+    public GenrePatchDTO delete(Long id) {
+        Genre genre = genreRepository.findById(id)
+                .orElseThrow(()
+                -> new ResourceNotFoundException("Can't find genre with " + id + " id") );
+        genreRepository.delete(genre);
+        return new GenrePatchDTO(genre.getId(), genre.getName());
 
     }
 

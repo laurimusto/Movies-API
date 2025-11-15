@@ -1,10 +1,12 @@
 package com.lauri.kood.movieapi.service;
+
 import com.lauri.kood.movieapi.dto.ActorPatchDTO;
 import com.lauri.kood.movieapi.dto.ActorResponseDTO;
 import com.lauri.kood.movieapi.entity.Actor;
 import com.lauri.kood.movieapi.exceptions.ResourceNotFoundException;
 import com.lauri.kood.movieapi.repository.ActorRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 /*
@@ -38,6 +40,7 @@ public class ActorService {
     private ActorResponseDTO toResponse(Actor actor) {
         return new ActorResponseDTO(actor.getId(), actor.getName(), actor.getBirthdate());
     }
+
     //create an actor with name and birthdate and return it to controller
     public ActorResponseDTO create(ActorPatchDTO actorDTO) {
         Actor actor = new Actor();
@@ -60,19 +63,25 @@ public class ActorService {
     }
 
     public List<ActorResponseDTO> filterByName(String name) { //search for a certain name in URL, else display an error.
-    List<Actor> list = actorRepository.findByNameContainingIgnoreCase(name);
-    if(list.isEmpty()) {
-        throw new ResourceNotFoundException("name " + name + " not found in database.");
-    } return list
+        List<Actor> list = actorRepository.findByNameContainingIgnoreCase(name);
+        if (list.isEmpty()) {
+            throw new ResourceNotFoundException("name " + name + " not found in database.");
+        }
+        return list
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    public ActorResponseDTO patchName(Long id, ActorPatchDTO patch) {
+    @Transactional
+    public ActorResponseDTO updateActor(Long id, ActorPatchDTO patch) {
         Actor actor = actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Actor with id " + id + " not found"));
-        if(patch.name() != null) { actor.setName(patch.name()); }
-        if(patch.birthdate() != null) { actor.setBirthdate(patch.birthdate()); }
+        if (patch.name() != null && !patch.name().isBlank()) {
+            actor.setName(patch.name());
+        }
+        if (patch.birthdate() != null) {
+            actor.setBirthdate(patch.birthdate());
+        }
         actorRepository.save(actor);
 
         return toResponse(actor);

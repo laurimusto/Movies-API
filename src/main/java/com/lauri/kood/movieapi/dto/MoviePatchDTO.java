@@ -1,4 +1,4 @@
 package com.lauri.kood.movieapi.dto;
 
-public record MoviePatchDTO() {
+public record MoviePatchDTO(String title) {
 }

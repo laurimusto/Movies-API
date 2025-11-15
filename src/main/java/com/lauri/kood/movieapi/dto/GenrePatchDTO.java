@@ -1,4 +1,7 @@
 package com.lauri.kood.movieapi.dto;
 
-public record GenrePatchDTO() {
+public record GenrePatchDTO(
+        Long id,
+        String name
+) {
 }
