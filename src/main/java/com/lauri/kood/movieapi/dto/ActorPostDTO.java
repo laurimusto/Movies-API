@@ -1,12 +1,9 @@
 package com.lauri.kood.movieapi.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.time.LocalDate;
 
-public record ActorRequestDTO(
+public record ActorPostDTO(
         String name,
-
         LocalDate birthdate)
 {
 }

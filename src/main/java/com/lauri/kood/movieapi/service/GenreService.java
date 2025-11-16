@@ -4,12 +4,14 @@ import com.lauri.kood.movieapi.dto.ActorPatchDTO;
 import com.lauri.kood.movieapi.dto.GenrePatchDTO;
 import com.lauri.kood.movieapi.dto.GenreResponseDTO;
 import com.lauri.kood.movieapi.entity.Genre;
+import com.lauri.kood.movieapi.exceptions.IllegalStateException;
 import com.lauri.kood.movieapi.exceptions.ResourceNotFoundException;
+import com.lauri.kood.movieapi.mapper.GenreMapper;
 import com.lauri.kood.movieapi.repository.GenreRepository;
-
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class GenreService {
@@ -20,23 +22,30 @@ public class GenreService {
         this.genreRepository = genreRepository;
     }
 
-    public Genre create(Genre genre) {
-        if (genre == null) {
-            throw new NullPointerException("genre can't be null");
-        } else {
-            return genreRepository.save(genre); //create new genre
-        }
+    private GenreResponseDTO toResponse(Genre genre) {
+        return new GenreResponseDTO(genre.getId(), genre.getName());
     }
 
-    public List<Genre> findAll() {
-        return genreRepository.findAll(); //retrieve all genres from database
+    public GenreResponseDTO create(GenrePatchDTO genreDto) {
+        Genre genre = new Genre();
+        genre.setName(genreDto.name());
+        Genre savedGenre = genreRepository.save(genre);
+        return toResponse(savedGenre);
+    }
+
+    public Set<GenreResponseDTO> findAll() {
+        return genreRepository.findAll()
+                .stream()
+                .map(genre -> new GenreResponseDTO(genre.getId(), genre.getName()))
+                .collect(Collectors.toSet()); //retrieve all genres from database
 
     }
 
-    public Genre findById(Long id) {
-        return genreRepository.findById(id)
+    public GenreResponseDTO findById(Long id) {
+        Genre genre = genreRepository.findById(id)
                 .orElseThrow(()
-                -> new ResourceNotFoundException("Can't find genre with " + id + " id") ); //retrieve genre by id
+                        -> new ResourceNotFoundException("Can't find genre with " + id + " id")); //retrieve genre by id
+        return toResponse(genre);
     }
 
     public GenreResponseDTO update(Long id, ActorPatchDTO newName) {
@@ -50,13 +59,23 @@ public class GenreService {
         return new GenreResponseDTO(genre.getId(), genre.getName());
     }
 
-    public GenrePatchDTO delete(Long id) {
+    public void delete(Long id, boolean force) {
         Genre genre = genreRepository.findById(id)
                 .orElseThrow(()
-                -> new ResourceNotFoundException("Can't find genre with " + id + " id") );
+                        -> new ResourceNotFoundException("Can't find genre with id: " + id));
+        boolean hasRelations = !genre.getMovies().isEmpty();
+        if(hasRelations && !force) {
+            throw new IllegalStateException("Cannot delete genre with related movies. Use force=true to override.");
+        }
         genreRepository.delete(genre);
-        return new GenrePatchDTO(genre.getId(), genre.getName());
+        System.out.println("Deleted genre with id " + id + " which is " + genre.getName());
+    }
 
+    public GenreResponseDTO updateGenre(Long id, GenrePatchDTO genreDto) {
+        Genre genre = genreRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find genre with id: " + id));
+        genre.setName(genreDto.name());
+        Genre updatedGenre = genreRepository.save(genre);
+        return GenreMapper.toGenreResponseDto(updatedGenre);
     }
 
 }

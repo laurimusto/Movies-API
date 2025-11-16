@@ -21,6 +21,6 @@ public record MovieResponseDTO(
         String title,
         String releaseYear,
         String duration,
-        List<ActorResponseDTO> actors,
+        Set<ActorResponseDTO> actors,
         Set<GenreResponseDTO> genres) {
 }

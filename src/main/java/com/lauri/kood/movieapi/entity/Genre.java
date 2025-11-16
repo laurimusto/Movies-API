@@ -3,8 +3,8 @@ package com.lauri.kood.movieapi.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Genre {
@@ -18,17 +18,13 @@ public class Genre {
     private String name;
 
     @ManyToMany(mappedBy = "genres")
-    private List<Movie> movies = new ArrayList<>();
+    private Set<Movie> movies = new HashSet<>();
 
     public Genre() {
     }
 
     public Genre(String name) {
         this.name = name;
-    }
-
-    public set<Movie> getMovies() {
-        return movies;
     }
 
     public Long getId() {
@@ -47,7 +43,7 @@ public class Genre {
         this.name = name;
     }
 
-    public List<Movie> getMovies() {
+    public Set<Movie> getMovies() {
         return movies;
     }
 
