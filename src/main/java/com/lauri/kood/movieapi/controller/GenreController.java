@@ -47,13 +47,13 @@ public class GenreController {
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT) //does not return anything after deletion, httpstatus 204
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}")//should always update using ID but never expose ID to client.
     public void deleteGenre(@PathVariable Long id, @RequestParam(defaultValue = "false") Boolean force) {
         genreService.delete(id, force);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PatchMapping("/{id}") //should always update using ID but never expose ID to client.
+    @PatchMapping("/{id}")
     public void updateGenre(@PathVariable Long id, @RequestBody GenrePatchDTO genreDto) {
        genreService.updateGenre(id, genreDto);
     }
@@ -67,7 +67,11 @@ Set up the following endpoints for each entity:
 POST /api/{entity}: Create a new entity ----- DONE
 GET /api/{entity}: Retrieve all entities  ----- DONE
 GET /api/{entity}/{id}: Retrieve a specific entity by ID ----- DONE
-DELETE /api/{entity}/{id}: Delete an entity ----- DONE
+
+DELETE /api/{entity}/{id}: Delete an entity
+Deleting a genre that has associated movies, the response should indicate that the operation can't be completed:
+Cannot delete genre 'Action' because it has 15 associated movies
+
 PATCH /api/{entity}/{id}: Partially update an existing entity ----- DONE
 
 

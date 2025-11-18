@@ -1,6 +1,9 @@
 package com.lauri.kood.movieapi.entity;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
+import java.time.Year;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,10 +15,10 @@ public class Movie {
 
     @Column(nullable = false)
     private String title;
-    private String releaseYear;
-    private String duration;
+    private Integer releaseYear;
+    private Integer duration;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "movie_actor",
             joinColumns = @JoinColumn(name = "movie_id"),
@@ -23,7 +26,7 @@ public class Movie {
     )
     private Set<Actor> actors = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "movie_genre",
             joinColumns = @JoinColumn(name = "movie_id"),
@@ -33,13 +36,13 @@ public class Movie {
 
     public Movie() {}
 
-    public Movie(String title, String releaseYear, String duration) {
+    public Movie(String title, Integer releaseYear, int duration) {
         this.title = title;
         this.releaseYear = releaseYear;
         this.duration = duration;
     }
 
-    public Movie(String title, String releaseYear, String duration,
+    public Movie(String title, Integer releaseYear, int duration,
                  Set<Genre> genres, Set<Actor> actors) {
         this.title = title;
         this.releaseYear = releaseYear;
@@ -55,11 +58,11 @@ public class Movie {
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
-    public String getReleaseYear() { return releaseYear; }
-    public void setReleaseYear(String releaseYear) { this.releaseYear = releaseYear; }
+    public Integer getReleaseYear() { return releaseYear; }
+    public void setReleaseYear(Integer releaseYear) { this.releaseYear = releaseYear; }
 
-    public String getDuration() { return duration; }
-    public void setDuration(String duration) { this.duration = duration; }
+    public Integer getDuration() { return duration; }
+    public void setDuration(Integer duration) { this.duration = duration; }
 
     public Set<Actor> getActors() { return actors; }
     public void setActors(Set<Actor> actors) { this.actors = actors; }
@@ -76,4 +79,5 @@ public class Movie {
                 ", duration='" + duration + '\'' +
                 '}';
     }
+
 }

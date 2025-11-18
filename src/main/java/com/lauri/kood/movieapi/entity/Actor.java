@@ -20,7 +20,7 @@ public class Actor {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthdate;
 
-    @ManyToMany(mappedBy = "actors")
+    @ManyToMany(mappedBy = "actors", fetch = FetchType.EAGER)
     private List<Movie> movies = new ArrayList<>();
 
     public Actor() { }

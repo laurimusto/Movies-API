@@ -10,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
+
 @RequestMapping(value = "/api/movies", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 public class MovieController {
@@ -19,28 +20,38 @@ public class MovieController {
     public MovieController(MovieService movieService) {
         this.movieService = movieService;
     }
+
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public MovieResponseDTO createMovie(@RequestBody @Validated MoviePostDTO moviePost){
+    public MovieResponseDTO createMovie(@RequestBody @Validated MoviePostDTO moviePost) {
         return movieService.createMovie(moviePost);
 
     }
-
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public Set<MovieResponseDTO> findByTitle(@RequestParam(required = false) @Validated String title) {
-        if(title != null && !title.isBlank()) {
+        if (title != null && !title.isBlank()) {
             MovieResponseDTO movie = movieService.findByTitle(title);
             return Set.of(movie);
         }
-    return movieService.getAll();
+        return movieService.getAll();
     }
-
+    @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}")
     public MovieResponseDTO findById(@PathVariable Long id) { //@Pathvariable is for finding the path in URL
-       return movieService.getMoviesById(id);
+        return movieService.getMoviesById(id);
     }
 
-
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")//should always update using ID but never expose ID to client.
+    public void deleteMovie(@PathVariable Long id, @RequestParam(defaultValue = "false") boolean force) {
+        movieService.deleteMovie(id, force);
+    }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PatchMapping("/{id}")//should always update using ID but never expose ID to client.
+    public void updateMovie(@PathVariable long id, @RequestBody MoviePatchDTO patchDTO) {
+        movieService.updateMovie(id, patchDTO);
+    }
 }
 
 /*
@@ -51,8 +62,17 @@ POST /api/{entity}: Create a new entity ----- DONE
 GET /api/{entity}: Retrieve all entities ----- DONE
 GET /api/{entity}/{id}: Retrieve a specific entity by ID ----- DONE
 
-PATCH /api/{entity}/{id}: Partially update an existing entity
 DELETE /api/{entity}/{id}: Delete an entity
+Deleting a genre that has associated movies, the response should indicate that the operation can't be completed:
+Cannot delete genre 'Action' because it has 15 associated movies
+
+validate year
+validate duration
+
+
+PATCH /api/{entity}/{id}: Partially update an existing entity
+update actors or genres
+
 Additionally, implement filtering endpoints for the following:
 
 GET /api/movies?genre={genreId}: Retrieve movies filtered by genre

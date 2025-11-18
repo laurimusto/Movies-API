@@ -17,7 +17,7 @@ public class Genre {
     @NotBlank(message = "Name must not be empty")
     private String name;
 
-    @ManyToMany(mappedBy = "genres")
+    @ManyToMany(mappedBy = "genres", fetch = FetchType.EAGER)
     private Set<Movie> movies = new HashSet<>();
 
     public Genre() {

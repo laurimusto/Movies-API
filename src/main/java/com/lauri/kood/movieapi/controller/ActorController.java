@@ -45,10 +45,22 @@ public class ActorController {
 
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping //create a new listing in a database with new ID
+    @PostMapping ("/{id}")//create a new listing in a database with new ID
     public ActorResponseDTO createActor(@RequestBody @Validated ActorPatchDTO actorDto) {
       return actorService.create(actorDto);
     }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")//should always update using ID but never expose ID to client.
+    public void deleteActor(@PathVariable Long id, @RequestParam(defaultValue = "false") boolean force) {
+        actorService.deleteActor(id, force);
+    }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PatchMapping("/{id}")//should always update using ID but never expose ID to client.
+    public void updateActor(@PathVariable Long id, @RequestBody ActorPatchDTO patch) {
+        actorService.updateActor(id, patch);
+    }
+
 
 
 
@@ -61,8 +73,12 @@ POST /api/{entity}: Create a new entity ----- DONE
 GET /api/{entity}: Retrieve all entities ----- DONE
 GET /api/{entity}/{id}: Retrieve a specific entity by ID ----- DONE
 
-PATCH /api/{entity}/{id}: Partially update an existing entity
 DELETE /api/{entity}/{id}: Delete an entity
+Deleting a genre that has associated movies, the response should indicate that the operation can't be completed:
+Cannot delete genre 'Action' because it has 15 associated movies
+
+PATCH /api/{entity}/{id}: Partially update an existing entity
+
 Additionally, implement filtering endpoints for the following:
 
 GET /api/movies?genre={genreId}: Retrieve movies filtered by genre

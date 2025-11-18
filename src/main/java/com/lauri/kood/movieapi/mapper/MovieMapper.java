@@ -27,6 +27,7 @@ public class MovieMapper {
                         .map(genre -> new GenreResponseDTO(
                                 genre.getId(),
                                 genre.getName()))
+
                         .collect(Collectors.toSet()
                         )
         );

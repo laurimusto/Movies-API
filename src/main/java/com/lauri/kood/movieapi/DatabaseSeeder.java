@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -107,29 +108,28 @@ public class DatabaseSeeder {
 
 
         // --- Movies ---
-        Movie dieHard = new Movie("Die Hard", "1988", "132",
+        Movie dieHard = new Movie("Die Hard", 1988, 132,
                 Set.of(action), Set.of(tomHanks));
-        Movie theMatrix = new Movie("The Matrix", "1999", "136",
+        Movie theMatrix = new Movie("The Matrix", 1999, Integer.parseInt("136"),
                 Set.of(action, sciFi), Set.of(keanu));
-        Movie inception = new Movie("Inception", "2010", "148",
+        Movie inception = new Movie("Inception", 2010, Integer.parseInt("148"),
                 Set.of(action, sciFi, thriller), Set.of(leonardo, tomHardy, ellenPage));
-        Movie interstellar = new Movie("Interstellar", "2014", "169",
+        Movie interstellar = new Movie("Interstellar", 2014, Integer.parseInt("169"),
                 Set.of(sciFi, drama, adventure), Set.of(matthewMcConaughey, anneHathaway, jessicaChastain));
-        Movie theGodfather = new Movie("The Godfather", "1972", "175",
+        Movie theGodfather = new Movie("The Godfather", 1972, Integer.parseInt("175"),
                 Set.of(drama, crime), Set.of(marlonBrando, alPacino, jamesCaan));
-        Movie pulpFiction = new Movie("Pulp Fiction", "1994", "154",
+        Movie pulpFiction = new Movie("Pulp Fiction", 1994, Integer.parseInt("154"),
                 Set.of(crime, drama, thriller), Set.of(johnTravolta, samuelLJackson, umaThurman));
-        Movie theDarkKnight = new Movie("The Dark Knight", "2008", "152",
+        Movie theDarkKnight = new Movie("The Dark Knight", 2008, Integer.parseInt("152"),
                 Set.of(action, thriller, drama), Set.of(christianBale, heathLedger, aaronEckhart));
-        Movie forrestGump = new Movie("Forrest Gump", "1994", "142",
+        Movie forrestGump = new Movie("Forrest Gump", 1994, Integer.parseInt("142"),
                 Set.of(drama, romance), Set.of(tomHanks, robinWright, garySinise));
-        Movie theAvengers = new Movie("The Avengers", "2012", "143",
+        Movie theAvengers = new Movie("The Avengers", 2012, Integer.parseInt("143"),
                 Set.of(action, adventure, sciFi), Set.of(robertDowneyJr, chrisEvans, scarlettJohansson));
-        Movie fightClub = new Movie("Fight Club", "1999", "139",
+        Movie fightClub = new Movie("Fight Club", 1999, Integer.parseInt("139"),
                 Set.of(drama, thriller), Set.of(bradPitt, edwardNorton, helenaBonhamCarter));
-        Movie avatar = new Movie("Avatar", "2009", "162",
+        Movie avatar = new Movie("Avatar", 2009, Integer.parseInt("162"),
                 Set.of(action, adventure, sciFi), Set.of(samWorthington, zoeSaldana, sigourneyWeaver));
-
 
         movieRepository.saveAll(Set.of(dieHard, theMatrix, inception, interstellar, theGodfather, pulpFiction, theDarkKnight, forrestGump, theAvengers, fightClub, avatar));
         System.out.println("✅ Sample Movies loaded!");

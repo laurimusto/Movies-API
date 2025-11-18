@@ -1,20 +1,23 @@
 package com.lauri.kood.movieapi.service;
 
+import com.lauri.kood.movieapi.dto.MoviePatchDTO;
 import com.lauri.kood.movieapi.dto.MoviePostDTO;
 import com.lauri.kood.movieapi.dto.MovieResponseDTO;
 import com.lauri.kood.movieapi.entity.Actor;
 import com.lauri.kood.movieapi.entity.Genre;
 import com.lauri.kood.movieapi.entity.Movie;
+import com.lauri.kood.movieapi.exceptions.InvalidDurationException;
+import com.lauri.kood.movieapi.exceptions.InvalidReleaseYearException;
+import com.lauri.kood.movieapi.exceptions.ResourceInUseException;
 import com.lauri.kood.movieapi.exceptions.ResourceNotFoundException;
 import com.lauri.kood.movieapi.mapper.MovieMapper;
 import com.lauri.kood.movieapi.repository.ActorRepository;
 import com.lauri.kood.movieapi.repository.GenreRepository;
 import com.lauri.kood.movieapi.repository.MovieRepository;
-import org.springframework.http.HttpStatus;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -82,5 +85,60 @@ public class MovieService {
         return MovieMapper.toMovieResponseDTO(movie);
 
     }
+
+    @Transactional
+    public void deleteMovie(Long id, boolean force) {
+        Movie movie = movieRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Movie with id -" + id + "- not found"));
+        boolean hasRelations = !movie.getActors().isEmpty() || !movie.getGenres().isEmpty();
+        if (hasRelations && !force) {
+            throw new ResourceInUseException("Cannot delete movie with related genres or actors. Use ?force=true to override.");
+        }
+        if (force) {// If forced, clear the many-to-many relations properly
+            movie.getActors().forEach(actor -> actor.getMovies().remove(movie)); //delete the movie from every actors list which appear in current movie.
+            movie.getActors().clear(); //delete movies own list of actors
+            movie.getGenres().forEach(genre -> genre.getMovies().remove(movie));
+            movie.getActors().clear();
+        }
+        movieRepository.delete(movie);
+        System.out.println("Deleted actor with id " + id + " which is " + movie.getTitle());
+    }
+
+    @Transactional
+    public MovieResponseDTO updateMovie(Long id, MoviePatchDTO patch) {
+        Movie movie = movieRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Movie with id -" + id + "- not found"));
+        if (patch.title() != null)
+            movie.setTitle(patch.title());//we might check for blank too but that may be the intention of the modifier - to leave it blank. otherwise we can use .isBlank()
+
+        if (patch.duration() != null){
+            validateDuration(patch.duration());
+        movie.setDuration(patch.duration()); } //runtime cannot be negative number.
+
+        if (patch.releaseYear() != null) {
+            validateYear(patch.releaseYear());
+            movie.setReleaseYear(patch.releaseYear());
+        }
+        return MovieMapper.toMovieResponseDTO(movie);
+    }
+
+    private void validateYear(Integer year) {
+        int currentYear = java.time.Year.now().getValue();
+        if (year < 1888 || year > currentYear) {
+            throw new InvalidReleaseYearException("Year " + year + " is invalid release year. Must be between 1888 and " + currentYear);
+        }
+    }
+
+    private void validateDuration(Integer duration) {
+        if (duration <= 0) {
+            throw new InvalidDurationException("Duration must be a positive number");
+        }
+    }
+
+    //placeholder for handling associations of movie-genre, movie-actor
+
+    //placeholder
 }
 

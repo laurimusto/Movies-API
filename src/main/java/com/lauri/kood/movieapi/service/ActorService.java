@@ -3,13 +3,12 @@ package com.lauri.kood.movieapi.service;
 import com.lauri.kood.movieapi.dto.ActorPatchDTO;
 import com.lauri.kood.movieapi.dto.ActorResponseDTO;
 import com.lauri.kood.movieapi.entity.Actor;
+import com.lauri.kood.movieapi.exceptions.ResourceInUseException;
 import com.lauri.kood.movieapi.exceptions.ResourceNotFoundException;
 import com.lauri.kood.movieapi.mapper.ActorMapper;
 import com.lauri.kood.movieapi.repository.ActorRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.List;
 import java.util.Set;
@@ -41,7 +40,6 @@ public class ActorService {
     public ActorService(ActorRepository actorRepository) {
         this.actorRepository = actorRepository;
     }
-
 
 
     //create an actor with name and birthdate and return it to controller
@@ -79,15 +77,28 @@ public class ActorService {
     @Transactional
     public ActorResponseDTO updateActor(Long id, ActorPatchDTO patch) {
         Actor actor = actorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Actor with id " + id + " not found"));
-        if (patch.name() != null && !patch.name().isBlank()) {
-            actor.setName(patch.name());
-        }
-        if (patch.birthdate() != null) {
-            actor.setBirthdate(patch.birthdate());
-        }
-        actorRepository.save(actor);
+        if (patch.name() != null) { actor.setName(patch.name());} //we might check for blank too but that may be the intention of the modifier - to leave it blank.
+        if (patch.birthdate() != null) {actor.setBirthdate(patch.birthdate()); }
+        actorRepository.save(actor);//save new actor after patching fields.
 
         return ActorMapper.toActorResponseDto(actor);
+    }
+
+    @Transactional
+    public void deleteActor(Long id, boolean force) {
+        Actor actor = actorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Can't find actor with id: " + id));
+        boolean hasRelations = !actor.getMovies().isEmpty();
+        if (hasRelations && !force) {
+            throw new ResourceInUseException("Cannot delete actor with related movies. Use ?force=true to override."); //Something is wrong here
+        }
+        if(force) {// If forced, clear the many-to-many relations properly
+            actor.getMovies().forEach(movie -> movie.getActors().remove(actor));
+            actor.getMovies().clear();
+        }
+
+        actorRepository.delete(actor);
+        System.out.println("Deleted actor with id " + id + " which is " + actor.getName());
     }
 
 }

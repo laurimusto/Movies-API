@@ -7,7 +7,8 @@ public class GenreMapper {
     public static GenreResponseDTO toGenreResponseDto(Genre genre) {
         return new GenreResponseDTO(
                 genre.getId(),
-                genre.getName()
+                genre.getName(),
+                genre.getMovies()
         );
     }
 }

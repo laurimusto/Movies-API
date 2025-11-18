@@ -5,6 +5,7 @@ import com.lauri.kood.movieapi.entity.Actor;
 import com.lauri.kood.movieapi.entity.Genre;
 import jakarta.persistence.Column;
 
+import java.time.Year;
 import java.util.List;
 import java.util.Set;
 
@@ -19,8 +20,8 @@ Set if you only care about unique membership and not sequence.
 public record MovieResponseDTO(
         Long Id,
         String title,
-        String releaseYear,
-        String duration,
+        Integer releaseYear,
+        Integer duration,
         Set<ActorResponseDTO> actors,
         Set<GenreResponseDTO> genres) {
 }

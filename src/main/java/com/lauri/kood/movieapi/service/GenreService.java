@@ -1,13 +1,14 @@
 package com.lauri.kood.movieapi.service;
 
-import com.lauri.kood.movieapi.dto.ActorPatchDTO;
 import com.lauri.kood.movieapi.dto.GenrePatchDTO;
 import com.lauri.kood.movieapi.dto.GenreResponseDTO;
+import com.lauri.kood.movieapi.dto.MovieResponseDTO;
 import com.lauri.kood.movieapi.entity.Genre;
-import com.lauri.kood.movieapi.exceptions.IllegalStateException;
+import com.lauri.kood.movieapi.exceptions.ResourceInUseException;
 import com.lauri.kood.movieapi.exceptions.ResourceNotFoundException;
 import com.lauri.kood.movieapi.mapper.GenreMapper;
 import com.lauri.kood.movieapi.repository.GenreRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -22,58 +23,61 @@ public class GenreService {
         this.genreRepository = genreRepository;
     }
 
-    private GenreResponseDTO toResponse(Genre genre) {
-        return new GenreResponseDTO(genre.getId(), genre.getName());
-    }
-
     public GenreResponseDTO create(GenrePatchDTO genreDto) {
         Genre genre = new Genre();
         genre.setName(genreDto.name());
         Genre savedGenre = genreRepository.save(genre);
-        return toResponse(savedGenre);
+        return GenreMapper.toGenreResponseDto(savedGenre);
     }
 
     public Set<GenreResponseDTO> findAll() {
         return genreRepository.findAll()
                 .stream()
-                .map(genre -> new GenreResponseDTO(genre.getId(), genre.getName()))
-                .collect(Collectors.toSet()); //retrieve all genres from database
+                .map(genre -> new GenreResponseDTO(genre.getId(), genre.getName())).collect(Collectors.toSet()); //retrieve all genres from database
+    }
 
+    @Transactional
+    public Set<MovieResponseDTO> getAllMoviesByGenre(Long id) {
+        Genre genre = genreRepository.findById(id)
+                .orElseThrow(()
+                        -> new ResourceNotFoundException("Can't find genre with " + id + " id")); //Retrieve genre by id
+        return GenreMapper.toGenreResponseDto(genre.getMovies());
+        /*
+        Something is wrong here with .getMovies, infite recursion is imminent.
+         */
     }
 
     public GenreResponseDTO findById(Long id) {
         Genre genre = genreRepository.findById(id)
                 .orElseThrow(()
-                        -> new ResourceNotFoundException("Can't find genre with " + id + " id")); //retrieve genre by id
-        return toResponse(genre);
+                        -> new ResourceNotFoundException("Can't find genre with " + id + " id")); //Retrieve genre by id
+        return GenreMapper.toGenreResponseDto(genre);
     }
 
-    public GenreResponseDTO update(Long id, ActorPatchDTO newName) {
-        Genre genre = genreRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Can't add new name"));
-        if (newName.name() != null && !newName.name().isBlank()) {
-            genre.setName(newName.name());
-        }
-
-        genreRepository.save(genre);
-        return new GenreResponseDTO(genre.getId(), genre.getName());
-    }
-
+    @Transactional
     public void delete(Long id, boolean force) {
         Genre genre = genreRepository.findById(id)
                 .orElseThrow(()
                         -> new ResourceNotFoundException("Can't find genre with id: " + id));
         boolean hasRelations = !genre.getMovies().isEmpty();
-        if(hasRelations && !force) {
-            throw new IllegalStateException("Cannot delete genre with related movies. Use force=true to override.");
+        if (hasRelations && !force) {
+            throw new ResourceInUseException("Cannot delete genre with related movies. Use ?force=true to override."); //Something is wrong here
+        }
+
+        if (force) {// If forced, clear the many-to-many relations properly
+            genre.getMovies().forEach(movie -> movie.getGenres().remove(genre));// Remove Genre from each Movie
+            genre.getMovies().clear();// Clear genre from movies list
         }
         genreRepository.delete(genre);
         System.out.println("Deleted genre with id " + id + " which is " + genre.getName());
     }
 
+    @Transactional
     public GenreResponseDTO updateGenre(Long id, GenrePatchDTO genreDto) {
         Genre genre = genreRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find genre with id: " + id));
-        genre.setName(genreDto.name());
+        if (genreDto.name() != null) {
+            genre.setName(genreDto.name());//we might check for blank too but that may be the intention of the modifier - to leave it blank. otherwise we can use .isBlank()
+        }
         Genre updatedGenre = genreRepository.save(genre);
         return GenreMapper.toGenreResponseDto(updatedGenre);
     }
