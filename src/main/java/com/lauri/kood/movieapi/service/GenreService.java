@@ -4,6 +4,7 @@ import com.lauri.kood.movieapi.dto.GenrePatchDTO;
 import com.lauri.kood.movieapi.dto.GenreResponseDTO;
 import com.lauri.kood.movieapi.dto.MovieResponseDTO;
 import com.lauri.kood.movieapi.entity.Genre;
+import com.lauri.kood.movieapi.entity.Movie;
 import com.lauri.kood.movieapi.exceptions.ResourceInUseException;
 import com.lauri.kood.movieapi.exceptions.ResourceNotFoundException;
 import com.lauri.kood.movieapi.mapper.GenreMapper;
@@ -37,13 +38,13 @@ public class GenreService {
     }
 
     @Transactional
-    public Set<MovieResponseDTO> getAllMoviesByGenre(Long id) {
+    public Set<Movie> getAllMoviesByGenre(Long id) {
         Genre genre = genreRepository.findById(id)
                 .orElseThrow(()
                         -> new ResourceNotFoundException("Can't find genre with " + id + " id")); //Retrieve genre by id
-        return GenreMapper.toGenreResponseDto(genre.getMovies());
+        return genre.getMovies();
         /*
-        Something is wrong here with .getMovies, infite recursion is imminent.
+        Something is wrong here with .getMovies, infinite recursion is imminent.
          */
     }
 

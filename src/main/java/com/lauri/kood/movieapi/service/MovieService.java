@@ -113,11 +113,12 @@ public class MovieService {
         if (patch.title() != null)
             movie.setTitle(patch.title());//we might check for blank too but that may be the intention of the modifier - to leave it blank. otherwise we can use .isBlank()
 
-        if (patch.duration() != null){
+        if (patch.duration() != null) { //runtime cannot be negative number.
             validateDuration(patch.duration());
-        movie.setDuration(patch.duration()); } //runtime cannot be negative number.
+            movie.setDuration(patch.duration());
+        }
 
-        if (patch.releaseYear() != null) {
+        if (patch.releaseYear() != null) { //release year must be between 1888 and now.
             validateYear(patch.releaseYear());
             movie.setReleaseYear(patch.releaseYear());
         }

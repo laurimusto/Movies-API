@@ -6,7 +6,7 @@ import java.util.Set;
 
 public record GenreResponseDTO(
         Long id,
-        String name,
-        Set<Movie> movies
+        String name
+        //Set<Movie> movies
 ) {
 }
