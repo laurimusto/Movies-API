@@ -129,7 +129,7 @@ public class DatabaseSeeder {
         Movie fightClub = new Movie("Fight Club", 1999, Integer.parseInt("139"),
                 Set.of(drama, thriller), Set.of(bradPitt, edwardNorton, helenaBonhamCarter));
         Movie avatar = new Movie("Avatar", 2009, Integer.parseInt("162"),
-                Set.of(action, adventure, sciFi), Set.of(samWorthington, zoeSaldana, sigourneyWeaver));
+                Set.of(action, adventure, sciFi, comedy), Set.of(samWorthington, zoeSaldana, sigourneyWeaver));
 
         movieRepository.saveAll(Set.of(dieHard, theMatrix, inception, interstellar, theGodfather, pulpFiction, theDarkKnight, forrestGump, theAvengers, fightClub, avatar));
         System.out.println("✅ Sample Movies loaded!");

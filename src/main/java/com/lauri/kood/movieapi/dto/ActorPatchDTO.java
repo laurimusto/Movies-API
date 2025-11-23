@@ -1,9 +1,11 @@
 package com.lauri.kood.movieapi.dto;
 import java.time.LocalDate;
+import java.util.Set;
 
 public record ActorPatchDTO(
-        Long id,
         String name,
-        LocalDate birthdate
+        LocalDate birthdate,
+        Set<Long> addMovieIds,
+        Set<Long> removeMovieIds
 ) {
 }

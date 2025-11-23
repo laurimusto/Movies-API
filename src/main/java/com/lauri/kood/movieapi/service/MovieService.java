@@ -14,14 +14,16 @@ import com.lauri.kood.movieapi.mapper.MovieMapper;
 import com.lauri.kood.movieapi.repository.ActorRepository;
 import com.lauri.kood.movieapi.repository.GenreRepository;
 import com.lauri.kood.movieapi.repository.MovieRepository;
+import jakarta.persistence.criteria.Join;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @Service
 public class MovieService {
@@ -37,25 +39,28 @@ public class MovieService {
     }
 
     public MovieResponseDTO createMovie(@RequestBody @Validated MoviePostDTO dto) { //@RequestBody can deserialize JSON into MoviePostDTO.
-        Set<Actor> actors = new HashSet<>();
-        for (Long id : dto.actors()) {
-            Actor actor = actorRepository.findById(id) // attempts to retrieve the corresponding Actor entity from the ActorRepository using the findById method.
-                    .orElseThrow(() -> new ResourceNotFoundException("Actor with id " + id + " not found"));
-            actors.add(actor);
+        Movie movie = new Movie();
+        movie.setTitle(dto.title());
+        movie.setReleaseYear(dto.releaseYear());
+        movie.setDuration(dto.duration());
+
+
+        if (dto.genres() != null && !dto.genres().isEmpty()) {
+            List<Genre> genres = genreRepository.findAllById(dto.genres());
+            if (genres.size() != dto.genres().size()) {
+                throw new ResourceNotFoundException("One or more genres not found");
+            }
+            movie.getGenres().addAll(genres);
         }
 
-        Set<Genre> genres = new HashSet<>();
-        for (long id : dto.genres()) {
-            Genre genre = genreRepository.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Genre with id " + id + " not found"));
-            genres.add(genre);
+        if (dto.actors() != null && !dto.actors().isEmpty()) {
+            List<Actor> actors = actorRepository.findAllById(dto.actors());
+            if (actors.size() != dto.actors().size()) {
+                throw new ResourceNotFoundException("One or more actors not found");
+            }
+            movie.getActors().addAll(actors);
         }
-
-        Movie movie = new Movie(dto.title(), dto.releaseYear(), dto.duration());
-        movie.setActors(actors);
-        movie.setGenres(genres);
-        movieRepository.save(movie);
-        return MovieMapper.toMovieResponseDTO(movie);
+        return MovieMapper.toMovieResponseDTO(movieRepository.save(movie));
     }
 
     public MovieResponseDTO getMoviesById(Long id) {
@@ -63,13 +68,54 @@ public class MovieService {
         return MovieMapper.toMovieResponseDTO(movie);
     }
 
-    public Set<MovieResponseDTO> getAll() {
-        System.out.println("this is getAll");
+    /*
+    if NO filters are provided in GET, it returns a full list of movies.
+    cb is CriteriaBuilder
+    Start with all movies.
+    If genreId is provided - narrow down movies by genre.
+    If releaseYear is provided - narrow down movies by year.
+    If actorId is provided - narrow down movies by actor.
+    If title is provided - narrow down movies by title substring.
+    Apply paging and sorting using Pageable.
+    Convert entities to DTOs - return Page<MovieResponseDTO>.
+     */
+    public Page<MovieResponseDTO> getAllMovies(
+            Long genreId,
+            Integer releaseYear,
+            Long actorId,
+            String title,
+            Pageable pageable) {
 
-        return movieRepository.findAll().stream()
-                .map(MovieMapper::toMovieResponseDTO)
-                .collect(Collectors.toSet());
+        Specification<Movie> spec = Specification.unrestricted();
+
+        if (genreId != null) {  //only applies if genreId is provided
+            spec = spec.and((movie, query, criteria) -> {
+                System.out.println("Filtering movie: " + movie.get("title")); //Root is a starting table(movie),
+                Join<Movie, Genre> genreJoin = movie.join("genres"); //Joins movie and genre(SQL JOIN) to see each movie's genres
+                return criteria.equal(genreJoin.get("id"), genreId); //generates SQL WHERE genre.id = ? Keep only movies that have a genre matching genreId
+            });
+        }
+        if (releaseYear != null) {
+            spec = spec.and((movie, query, criteria) -> //This line adds a filter to the query that only selects movies whose releaseYear matches the value provided.
+                    criteria.equal(movie.get("releaseYear"), releaseYear)); //no join needed because its in movie table.
+        }
+        if (actorId != null) {
+            spec = spec.and((movie, query, criteria) -> {
+                Join<Movie, Actor> actorJoin = movie.join("actors");
+                return criteria.equal(actorJoin.get("id"), actorId);
+            });
+
+        }
+        if (title != null && !title.isBlank()) {
+            spec = spec.and((movie, query, criteria) ->
+                    criteria.like(criteria.lower(movie.get("title")), "%" + title.toLowerCase() + "%")); //Case-insensitive partial match: SQL LIKE "%keyword%",% is wildcard, meaning “anything before or after”
+        }
+
+        return movieRepository.findAll(spec, pageable)
+                .map(MovieMapper::toMovieResponseDTO);
+
     }
+
 
     public MovieResponseDTO findByTitle(String title) {
         System.out.println("prints this");
@@ -93,8 +139,14 @@ public class MovieService {
                 .orElseThrow(() -> new ResourceNotFoundException("Movie with id -" + id + "- not found"));
         boolean hasRelations = !movie.getActors().isEmpty() || !movie.getGenres().isEmpty();
         if (hasRelations && !force) {
-            throw new ResourceInUseException("Cannot delete movie with related genres or actors. Use ?force=true to override.");
+            throw new ResourceInUseException(String.format(
+                    "Cannot delete movie [%s] because it has [%d] actors and [%d] genres",
+                    movie.getTitle(),
+                    movie.getActors().size(),
+                    movie.getGenres().size()
+            ));
         }
+
         if (force) {// If forced, clear the many-to-many relations properly
             movie.getActors().forEach(actor -> actor.getMovies().remove(movie)); //delete the movie from every actors list which appear in current movie.
             movie.getActors().clear(); //delete movies own list of actors
@@ -123,6 +175,13 @@ public class MovieService {
             movie.setReleaseYear(patch.releaseYear());
         }
         return MovieMapper.toMovieResponseDTO(movie);
+    }
+
+    @Transactional
+    public MovieResponseDTO filterMovies(Long genreId) {
+        Movie movie = movieRepository.findByGenresId(genreId).stream().findFirst().orElseThrow(() -> new ResourceNotFoundException("No movies found for genre ID  " + genreId));
+        return MovieMapper.toMovieResponseDTO(movie);
+
     }
 
     private void validateYear(Integer year) {

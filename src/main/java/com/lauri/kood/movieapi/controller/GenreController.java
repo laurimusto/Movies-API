@@ -46,18 +46,17 @@ public class GenreController {
         return genreService.create(genreDto);
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @PatchMapping("/{id}")
+    public GenreResponseDTO updateGenre(@PathVariable Long id, @RequestBody GenrePatchDTO genreDto) {
+        return genreService.updateGenre(id, genreDto);
+    }
+
     @ResponseStatus(HttpStatus.NO_CONTENT) //does not return anything after deletion, httpstatus 204
     @DeleteMapping("/{id}")//should always update using ID but never expose ID to client.
     public void deleteGenre(@PathVariable Long id, @RequestParam(defaultValue = "false") Boolean force) {
         genreService.delete(id, force);
     }
-
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PatchMapping("/{id}")
-    public void updateGenre(@PathVariable Long id, @RequestBody GenrePatchDTO genreDto) {
-       genreService.updateGenre(id, genreDto);
-    }
-
 }
 /*
 Implement controller classes: GenreController, MovieController, and ActorController

@@ -1,9 +1,15 @@
 package com.lauri.kood.movieapi.controller;
 
+import com.lauri.kood.movieapi.PaginationValidator;
 import com.lauri.kood.movieapi.dto.ActorPatchDTO;
 import com.lauri.kood.movieapi.dto.ActorResponseDTO;
+import com.lauri.kood.movieapi.dto.MovieResponseDTO;
 import com.lauri.kood.movieapi.service.ActorService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -14,8 +20,6 @@ import org.springframework.web.bind.annotation.*;
     JSON data — and not HTML, XML, or plain text.
 
  */
-import java.util.List;
-import java.util.Set;
 
 @RequestMapping(value = "/api/actors", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
@@ -29,25 +33,49 @@ public class ActorController {
     }
 
     @GetMapping //get every actor from a database.
-    public Set<ActorResponseDTO> getAll() {
-        return actorService.getAll();
+    public Page<ActorResponseDTO> getAll(@RequestParam(required = false) String name,
+                                         @RequestParam(defaultValue = "0") int page,
+                                         @RequestParam(defaultValue = "99") int size) {
+        PaginationValidator.validate(page, size);
+        Pageable pageable = PageRequest.of(page, size);
+        return actorService.getAll(name, pageable);
+    }
+
+    @GetMapping("/search")
+    public Page<ActorResponseDTO> searchByName(@RequestParam String name,
+                                               @RequestParam(defaultValue = "0") int page,
+                                               @RequestParam(defaultValue = "99") int size) {
+
+        PaginationValidator.validate(page, size);
+        Pageable pageable = PageRequest.of(page, size);
+        return actorService.getName(name, pageable);
     }
 
     @GetMapping("/{id}")//get Actor with corresponding ID from a database.
     public ActorResponseDTO findById(@PathVariable Long id) {
         return actorService.findById(id);
     }
-    
-    @GetMapping("/search") //Search for a certain user in url using /search?name=Leonardo%20Dicaprio
-    public Set<ActorResponseDTO> filterByName(@PathVariable String name) {
-    return actorService.filterByName(name);
+
+    @GetMapping("/{id}/movies")
+    public Page<MovieResponseDTO> getMoviesByActor(@PathVariable Long id,
+                                                   @RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "99") int size) {
+        PaginationValidator.validate(page, size);
+        Pageable pageable = PageRequest.of(page, size);
+        return actorService.getMoviesByActor(id, pageable);
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/{id}")//create a new listing in a database with new ID
+    public ActorResponseDTO createActor(@RequestBody @Valid ActorPatchDTO actorDto) {
+        return actorService.create(actorDto);
     }
 
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping ("/{id}")//create a new listing in a database with new ID
-    public ActorResponseDTO createActor(@RequestBody @Validated ActorPatchDTO actorDto) {
-      return actorService.create(actorDto);
+    @ResponseStatus(HttpStatus.OK)
+    @PatchMapping("/{id}")//should always update using ID but never expose ID to client.
+    public ActorResponseDTO updateActor(@PathVariable Long id, @Valid @RequestBody ActorPatchDTO patch) {
+        return actorService.updateActor(id, patch);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -55,13 +83,6 @@ public class ActorController {
     public void deleteActor(@PathVariable Long id, @RequestParam(defaultValue = "false") boolean force) {
         actorService.deleteActor(id, force);
     }
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PatchMapping("/{id}")//should always update using ID but never expose ID to client.
-    public void updateActor(@PathVariable Long id, @RequestBody ActorPatchDTO patch) {
-        actorService.updateActor(id, patch);
-    }
-
-
 
 
 }

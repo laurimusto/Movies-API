@@ -5,7 +5,8 @@ import com.lauri.kood.movieapi.entity.Actor;
 
 public class ActorMapper {
     public static ActorResponseDTO toActorResponseDto(Actor actor) {
-        return new ActorResponseDTO(actor.getId(),
+        return new ActorResponseDTO(
+                actor.getId(),
                 actor.getName(),
                 actor.getBirthdate()
         );

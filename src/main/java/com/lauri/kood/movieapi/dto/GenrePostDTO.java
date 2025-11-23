@@ -1,4 +1,7 @@
 package com.lauri.kood.movieapi.dto;
 
-public record GenrePostDTO(String name) {
+import jakarta.validation.constraints.NotNull;
+
+public record GenrePostDTO(@NotNull
+                           String name) {
 }
