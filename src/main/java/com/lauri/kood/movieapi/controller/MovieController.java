@@ -1,10 +1,8 @@
 package com.lauri.kood.movieapi.controller;
 
 import com.lauri.kood.movieapi.PaginationValidator;
-import com.lauri.kood.movieapi.dto.GenrePatchDTO;
-import com.lauri.kood.movieapi.dto.MoviePatchDTO;
-import com.lauri.kood.movieapi.dto.MoviePostDTO;
-import com.lauri.kood.movieapi.dto.MovieResponseDTO;
+import com.lauri.kood.movieapi.dto.*;
+import com.lauri.kood.movieapi.repository.MovieRepository;
 import com.lauri.kood.movieapi.service.MovieService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -22,9 +20,11 @@ import java.util.Set;
 public class MovieController {
 
     private final MovieService movieService;
+    private final MovieRepository movieRepository;
 
-    public MovieController(MovieService movieService) {
+    public MovieController(MovieService movieService, MovieRepository movieRepository) {
         this.movieService = movieService;
+        this.movieRepository = movieRepository;
     }
 
     @ResponseStatus(HttpStatus.OK)
@@ -34,30 +34,11 @@ public class MovieController {
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) Long actor,
             @RequestParam(required = false) String title,
-            @RequestParam(defaultValue = "0")int page,
-            @RequestParam(defaultValue = "99")int size) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "99") int size) {
         PaginationValidator.validate(page, size);
         Pageable pageable = PageRequest.of(page, size);
         return movieService.getAllMovies(genre, year, actor, title, pageable);
-    }
-
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/{id}")
-    public MovieResponseDTO findById(@PathVariable Long id) { //@Pathvariable is for finding the path in URL
-        return movieService.getMoviesById(id);
-    }
-
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{id}")//should always update using ID but never expose ID to client.
-    public void deleteMovie(@PathVariable Long id, @RequestParam(defaultValue = "false") boolean force) {
-        movieService.deleteMovie(id, force);
-    }
-
-
-    @ResponseStatus(HttpStatus.OK)
-    @PatchMapping("/{id}")//should always update using ID but never expose ID to client.
-    public MovieResponseDTO updateMovie(@PathVariable long id, @RequestBody MoviePatchDTO patchDTO) {
-        return movieService.updateMovie(id, patchDTO);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -65,6 +46,46 @@ public class MovieController {
     public MovieResponseDTO createMovie(@RequestBody @Valid MoviePostDTO moviePost) {
         return movieService.createMovie(moviePost);
     }
+
+    @GetMapping("/{id}")
+    public MovieResponseDTO findById(@PathVariable Long id) { //@Pathvariable is for finding the path in URL "{id}"
+
+        return movieService.getMoviesById(id);
+    }
+
+    @GetMapping("/search")
+    public Page<MovieResponseDTO> findByTitle(@RequestParam String title,
+                                              @RequestParam(defaultValue = "0") int page,
+                                              @RequestParam(defaultValue = "99") int size) {
+        PaginationValidator.validate(page, size);
+        Pageable pageable = PageRequest.of(page, size);
+        return movieService.findByTitle(title, pageable);
+    }
+
+    @GetMapping("/{id}/actors")
+    public Page<ActorResponseDTO> findMovieByActors(@PathVariable Long id,
+                                                    @RequestParam(defaultValue = "0") int page,
+                                                    @RequestParam(defaultValue = "99") int size) {
+        PaginationValidator.validate(page, size);
+        Pageable pageable = PageRequest.of(page, size);
+        return movieService.findMovieByActor(id, pageable);
+    }
+
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")//should always update using ID but never expose ID to client.
+    public void deleteMovie(@PathVariable Long id, @RequestParam(defaultValue = "false") boolean force) {
+        movieService.deleteMovieById(id, force);
+    }
+
+
+    @ResponseStatus(HttpStatus.OK)
+    @PatchMapping("/{id}")//should always update using ID but never expose ID to client.
+    public MovieResponseDTO updateMovie(@PathVariable long id, @RequestBody @Valid MoviePatchDTO patchDTO) {
+        return movieService.updateMovie(id, patchDTO);
+    }
+
+
 }
 
 /*

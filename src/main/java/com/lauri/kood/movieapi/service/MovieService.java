@@ -1,8 +1,6 @@
 package com.lauri.kood.movieapi.service;
 
-import com.lauri.kood.movieapi.dto.MoviePatchDTO;
-import com.lauri.kood.movieapi.dto.MoviePostDTO;
-import com.lauri.kood.movieapi.dto.MovieResponseDTO;
+import com.lauri.kood.movieapi.dto.*;
 import com.lauri.kood.movieapi.entity.Actor;
 import com.lauri.kood.movieapi.entity.Genre;
 import com.lauri.kood.movieapi.entity.Movie;
@@ -38,6 +36,7 @@ public class MovieService {
         this.genreRepository = genreRepository;
     }
 
+    @Transactional
     public MovieResponseDTO createMovie(@RequestBody @Validated MoviePostDTO dto) { //@RequestBody can deserialize JSON into MoviePostDTO.
         Movie movie = new Movie();
         movie.setTitle(dto.title());
@@ -117,23 +116,20 @@ public class MovieService {
     }
 
 
-    public MovieResponseDTO findByTitle(String title) {
-        System.out.println("prints this");
-        Movie movie = movieRepository.findByTitleIgnoreCase(title)
-                .orElseThrow(() -> new ResourceNotFoundException("Movie with title " + title + " not found"));
-        return MovieMapper.toMovieResponseDTO(movie);
+    public Page<MovieResponseDTO> findByTitle(String title, Pageable pageable) {
+        System.out.println("prints findByTitle");
+        return movieRepository.findByTitleContainingIgnoreCase(title, pageable)
+                .map(MovieMapper::toMovieResponseDTO);
     }
 
-    public MovieResponseDTO findByTitleLike(String title) {
-        System.out.println("not this one");
-        Movie movie = movieRepository.findByTitleLikeIgnoreCase(title)
-                .orElseThrow(() -> new ResourceNotFoundException("Movie with title " + title + " not found"));
-        return MovieMapper.toMovieResponseDTO(movie);
-
+    public Page<ActorResponseDTO> findMovieByActor(Long movieId, Pageable pageable) {
+        return actorRepository.findByMovies_Id(movieId, pageable)
+                .map(actor -> new ActorResponseDTO(actor.getId(), actor.getName(), actor.getBirthdate()));
     }
+
 
     @Transactional
-    public void deleteMovie(Long id, boolean force) {
+    public void deleteMovieById(Long id, boolean force) {
         Movie movie = movieRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie with id -" + id + "- not found"));
@@ -162,6 +158,7 @@ public class MovieService {
         Movie movie = movieRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie with id -" + id + "- not found"));
+
         if (patch.title() != null)
             movie.setTitle(patch.title());//we might check for blank too but that may be the intention of the modifier - to leave it blank. otherwise we can use .isBlank()
 
@@ -174,14 +171,11 @@ public class MovieService {
             validateYear(patch.releaseYear());
             movie.setReleaseYear(patch.releaseYear());
         }
-        return MovieMapper.toMovieResponseDTO(movie);
-    }
 
-    @Transactional
-    public MovieResponseDTO filterMovies(Long genreId) {
-        Movie movie = movieRepository.findByGenresId(genreId).stream().findFirst().orElseThrow(() -> new ResourceNotFoundException("No movies found for genre ID  " + genreId));
-        return MovieMapper.toMovieResponseDTO(movie);
+        handleGenreUpdates(movie, patch);
+        handleActorUpdates(movie, patch);
 
+        return MovieMapper.toMovieResponseDTO(movie);
     }
 
     private void validateYear(Integer year) {
@@ -197,8 +191,52 @@ public class MovieService {
         }
     }
 
-    //placeholder for handling associations of movie-genre, movie-actor
+    //for handling associations of movie-genre
+    private void handleGenreUpdates(Movie movie, MoviePatchDTO dto) {
+        if (dto.addGenreIds() != null && !dto.addActorIds().isEmpty()) {
+            List<Genre> genresToAdd = genreRepository.findAllById(dto.addActorIds());
+            if (genresToAdd.size() != dto.addActorIds().size()) {
+                throw new ResourceNotFoundException("One or more genre IDs not found");
+            }
+            movie.getGenres().addAll(genresToAdd);
+        }
+        if (dto.removeGenreIds() != null && !dto.removeGenreIds().isEmpty()) {
+            List<Genre> toRemoveGenres = genreRepository.findAllById(dto.removeGenreIds());
+            if (toRemoveGenres.size() != dto.removeGenreIds().size()) {
+                throw new ResourceNotFoundException("One or more genre IDs not found");
+            }
+            toRemoveGenres.forEach(genre -> {
+                movie.getGenres().remove(genre);
+                genre.getMovies().remove(movie);
+            });
 
-    //placeholder
+        }
+
+    }
+
+    //for handling associations of movie-actor
+    public void handleActorUpdates(Movie movie, MoviePatchDTO dto) {
+        if (dto.addActorIds() != null && !dto.addActorIds().isEmpty()) {
+            List<Actor> actorsToAdd = actorRepository.findAllById(dto.addActorIds());
+            if (dto.addActorIds().size() != actorsToAdd.size()) {
+                throw new ResourceNotFoundException("One or movie ids not found");
+            }
+            movie.getActors().addAll(actorsToAdd);
+        }
+
+        if (dto.removeActorIds() != null && !dto.removeActorIds().isEmpty()) {
+            List<Actor> actorsToRemove = actorRepository.findAllById(dto.removeActorIds());
+            if (dto.removeActorIds().size() != actorsToRemove.size()) {
+                throw new ResourceNotFoundException("One or movie ids not found");
+            }
+            actorsToRemove.forEach(actor -> {
+                movie.getActors().remove(actor);
+                actor.getMovies().remove(movie);
+            });
+
+        }
+
+
+    }
 }
 
