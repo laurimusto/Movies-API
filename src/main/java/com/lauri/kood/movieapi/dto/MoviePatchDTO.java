@@ -6,6 +6,8 @@ import java.util.Set;
 public record MoviePatchDTO(String title,
                             Integer releaseYear,
                             Integer duration,
-                            Set<Long> actors,
-                            Set<Long> genres) {
+                            Set<Long> addActorIds,
+                            Set<Long> addGenreIds,
+                            Set<Long> removeActorIds,
+                            Set<Long>removeGenreIds) {
 }

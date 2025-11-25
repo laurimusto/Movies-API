@@ -1,5 +1,6 @@
 package com.lauri.kood.movieapi.controller;
 
+import com.lauri.kood.movieapi.PaginationValidator;
 import com.lauri.kood.movieapi.dto.ActorPatchDTO;
 import com.lauri.kood.movieapi.dto.GenrePatchDTO;
 import com.lauri.kood.movieapi.dto.GenrePostDTO;
@@ -8,6 +9,10 @@ import com.lauri.kood.movieapi.entity.Genre;
 import com.lauri.kood.movieapi.repository.GenreRepository;
 import com.lauri.kood.movieapi.service.GenreService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.bind.DefaultValue;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -31,8 +36,12 @@ public class GenreController {
     // Aggregate root
     // tag::get-aggregate-root[]
     @GetMapping//returns httpstatus 200 by default
-    public Set<GenreResponseDTO> All() {
-        return genreService.findAll();
+    public Page<GenreResponseDTO> findAll(@RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "99") int size) {
+        PaginationValidator.validate(page, size);
+        Pageable pageable = PageRequest.of(page, size);
+
+        return genreService.findAll(pageable);
     }
 
     @GetMapping("/{id}") //returns httpstatus 200 by default

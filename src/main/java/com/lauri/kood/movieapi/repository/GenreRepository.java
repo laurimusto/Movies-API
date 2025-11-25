@@ -10,9 +10,4 @@ import java.util.List;
 import java.util.Set;
 
 public interface GenreRepository extends JpaRepository<Genre, Long> {
-    Genre findByName(String name);
-
-    List<Genre> findAllByMovies(Set<Movie> movies);
-
-    List<Genre> findGenreByMoviesIn(Collection<Set<Movie>> movies);
 }

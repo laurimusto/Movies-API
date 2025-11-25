@@ -10,10 +10,10 @@ import com.lauri.kood.movieapi.exceptions.ResourceNotFoundException;
 import com.lauri.kood.movieapi.mapper.GenreMapper;
 import com.lauri.kood.movieapi.repository.GenreRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class GenreService {
@@ -31,10 +31,9 @@ public class GenreService {
         return GenreMapper.toGenreResponseDto(savedGenre);
     }
 
-    public Set<GenreResponseDTO> findAll() {
-        return genreRepository.findAll()
-                .stream()
-                .map(genre -> new GenreResponseDTO(genre.getId(), genre.getName())).collect(Collectors.toSet()); //retrieve all genres from database
+    public Page<GenreResponseDTO> findAll(Pageable pageable) {
+        return genreRepository.findAll(pageable)
+                .map(genre -> new GenreResponseDTO(genre.getId(), genre.getName())); //retrieve all genres from database
     }
 
     @Transactional
