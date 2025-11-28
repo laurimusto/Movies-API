@@ -13,7 +13,6 @@ public record MoviePostDTO(
         @NotNull(message = "Title is required")
         String title,
         @NotNull(message = "Release year is required")
-        @Past(message = "cant be in future")
         @Min(value = 1888, message = "Release year must be no earlier than 1888")
         Integer releaseYear,
         @NotNull(message = "Duration is required")
@@ -23,5 +22,4 @@ public record MoviePostDTO(
         Set<Long> actors,
         @NotNull
         Set<Long> genres) {
-
 }

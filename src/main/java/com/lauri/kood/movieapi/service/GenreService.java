@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.util.Set;
 
 @Service
@@ -33,29 +34,20 @@ public class GenreService {
 
     public Page<GenreResponseDTO> findAll(Pageable pageable) {
         return genreRepository.findAll(pageable)
-                .map(genre -> new GenreResponseDTO(genre.getId(), genre.getName())); //retrieve all genres from database
-    }
-
-    @Transactional
-    public Set<Movie> getAllMoviesByGenre(Long id) {
-        Genre genre = genreRepository.findById(id)
-                .orElseThrow(()
-                        -> new ResourceNotFoundException("Can't find genre with " + id + " id")); //Retrieve genre by id
-        return genre.getMovies();
-        /*
-        Something is wrong here with .getMovies, infinite recursion is imminent.
-         */
+                .map(genre
+                        -> new GenreResponseDTO(genre.getId(), genre.getName())); //retrieve all genres from database
     }
 
     public GenreResponseDTO findById(Long id) {
-        Genre genre = genreRepository.findById(id)
+        Genre genre = genreRepository
+                .findById(id)
                 .orElseThrow(()
                         -> new ResourceNotFoundException("Can't find genre with " + id + " id")); //Retrieve genre by id
         return GenreMapper.toGenreResponseDto(genre);
     }
 
     @Transactional
-    public void delete(Long id, boolean force) {
+    public void deleteGenre(Long id, boolean force) {
         Genre genre = genreRepository.findById(id)
                 .orElseThrow(()
                         -> new ResourceNotFoundException("Can't find genre with id: " + id));
@@ -74,10 +66,14 @@ public class GenreService {
 
     @Transactional
     public GenreResponseDTO updateGenre(Long id, GenrePatchDTO genreDto) {
-        Genre genre = genreRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Can't find genre with id: " + id));
+        Genre genre = genreRepository
+                .findById(id)
+                .orElseThrow(()
+                        -> new ResourceNotFoundException("Can't find genre with id: " + id));
         if (genreDto.name() != null) {
             genre.setName(genreDto.name());//we might check for blank too but that may be the intention of the modifier - to leave it blank. otherwise we can use .isBlank()
         }
+
         Genre updatedGenre = genreRepository.save(genre);
         return GenreMapper.toGenreResponseDto(updatedGenre);
     }

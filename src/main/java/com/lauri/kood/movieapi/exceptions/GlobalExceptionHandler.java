@@ -20,6 +20,8 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
+
+    //Handling entities in use exceptions.
     @ExceptionHandler(ResourceInUseException.class)
     public ResponseEntity<ErrorResponseDTO> handleResourceInUseException(ResourceInUseException ex) {
         ErrorResponseDTO error = new ErrorResponseDTO(
@@ -28,7 +30,7 @@ public class GlobalExceptionHandler {
                 LocalDateTime.now());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
-
+//method for handling everything else.
     public ResponseEntity<String> handleAll(Exception ex) {
         return new ResponseEntity<>("An unexpected error occured.", HttpStatus.INTERNAL_SERVER_ERROR);
     }

@@ -32,7 +32,7 @@ public class ActorController {
         this.actorService = actorService;
     }
 
-    @GetMapping //get every actor from a database.
+    @GetMapping //get every actor from a database and also apply filters if needed.
     public Page<ActorResponseDTO> getAll(@RequestParam(required = false) String name,
                                          @RequestParam(defaultValue = "0") int page,
                                          @RequestParam(defaultValue = "99") int size) {
@@ -41,7 +41,7 @@ public class ActorController {
         return actorService.getAll(name, pageable);
     }
 
-    @GetMapping("/search")
+    @GetMapping("/search") //enables searching by keyword
     public Page<ActorResponseDTO> searchByName(@RequestParam String name,
                                                @RequestParam(defaultValue = "0") int page,
                                                @RequestParam(defaultValue = "99") int size) {
@@ -56,7 +56,7 @@ public class ActorController {
         return actorService.findById(id);
     }
 
-    @GetMapping("/{id}/movies")
+    @GetMapping("/{id}/movies") //return all movies where actor has appeared
     public Page<MovieResponseDTO> getMoviesByActor(@PathVariable Long id,
                                                    @RequestParam(defaultValue = "0") int page,
                                                    @RequestParam(defaultValue = "99") int size) {
@@ -66,7 +66,7 @@ public class ActorController {
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/{id}")//create a new listing in a database with new ID
+    @PostMapping//create a new listing in a database with new ID
     public ActorResponseDTO createActor(@RequestBody @Valid ActorPatchDTO actorDto) {
         return actorService.create(actorDto);
     }

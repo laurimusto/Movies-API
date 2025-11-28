@@ -37,10 +37,13 @@ public class MovieService {
     }
 
     @Transactional
-    public MovieResponseDTO createMovie(@RequestBody @Validated MoviePostDTO dto) { //@RequestBody can deserialize JSON into MoviePostDTO.
+    public MovieResponseDTO createMovie(@RequestBody MoviePostDTO dto) { //@RequestBody can deserialize JSON into MoviePostDTO.
         Movie movie = new Movie();
         movie.setTitle(dto.title());
-        movie.setReleaseYear(dto.releaseYear());
+        if(dto.releaseYear() !=null ) {
+            validateYear(dto.releaseYear());
+            movie.setReleaseYear(dto.releaseYear());
+        }
         movie.setDuration(dto.duration());
 
 
