@@ -1,10 +1,7 @@
 package com.lauri.kood.movieapi.controller;
 
 import com.lauri.kood.movieapi.PaginationValidator;
-import com.lauri.kood.movieapi.dto.ActorPatchDTO;
-import com.lauri.kood.movieapi.dto.GenrePatchDTO;
-import com.lauri.kood.movieapi.dto.GenrePostDTO;
-import com.lauri.kood.movieapi.dto.GenreResponseDTO;
+import com.lauri.kood.movieapi.dto.*;
 import com.lauri.kood.movieapi.entity.Genre;
 import com.lauri.kood.movieapi.repository.GenreRepository;
 import com.lauri.kood.movieapi.service.GenreService;
@@ -15,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,6 +45,15 @@ public class GenreController {
         return genreService.findById(id);
     }
 
+    @GetMapping("/{id}/movies") //return all movies where actor has appeared
+    public Page<MovieResponseDTO> getMoviesByGenres(@PathVariable Long id,
+                                                   @RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "99") int size) {
+        PaginationValidator.validate(page, size);
+        Pageable pageable = PageRequest.of(page, size);
+        return genreService.getMoviesByGenres(id, pageable);
+    }
+
     @ResponseStatus(HttpStatus.CREATED) //returns httpstatus 201
     @PostMapping
     public GenreResponseDTO create(@RequestBody @Validated GenrePatchDTO genreDto) {
@@ -59,7 +66,7 @@ public class GenreController {
                                         @RequestBody GenrePatchDTO genreDto) {
         return genreService.updateGenre(id, genreDto);
     }
-
+@Transactional
     @ResponseStatus(HttpStatus.NO_CONTENT) //does not return anything after deletion, httpstatus 204
     @DeleteMapping("/{id}")//should always update using ID but never expose ID to client.
     public void deleteGenre(@PathVariable Long id, @RequestParam(defaultValue = "false") Boolean force) {

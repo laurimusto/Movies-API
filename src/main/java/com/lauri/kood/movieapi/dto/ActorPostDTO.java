@@ -8,10 +8,12 @@ import jakarta.validation.constraints.Past;
 import java.time.LocalDate;
 
 public record ActorPostDTO(
-        @NotBlank String name,
+        @NotNull
+        @NotBlank
+        String name,
         @NotNull
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
         @Past
-        LocalDate birthDate
+        LocalDate birthdate
 ) {
 }

@@ -12,4 +12,5 @@ import java.util.Set;
 public interface MovieRepository extends JpaRepository<Movie, Long>, JpaSpecificationExecutor<Movie> {
     Page<Movie> findByTitleContainingIgnoreCase(String title, Pageable pageable);
     Page<Movie> findByActors_Id(Long actorId, Pageable pageable);
+    Page<Movie> findByGenres_Id(Long actorId, Pageable pageable);
 }

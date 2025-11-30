@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,7 +72,7 @@ public class MovieController {
         return movieService.findMovieByActor(id, pageable);
     }
 
-
+@Transactional
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")//should always update using ID but never expose ID to client.
     public void deleteMovie(@PathVariable Long id, @RequestParam(defaultValue = "false") boolean force) {

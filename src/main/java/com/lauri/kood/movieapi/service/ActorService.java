@@ -1,6 +1,7 @@
 package com.lauri.kood.movieapi.service;
 
 import com.lauri.kood.movieapi.dto.ActorPatchDTO;
+import com.lauri.kood.movieapi.dto.ActorPostDTO;
 import com.lauri.kood.movieapi.dto.ActorResponseDTO;
 import com.lauri.kood.movieapi.dto.MovieResponseDTO;
 import com.lauri.kood.movieapi.entity.Actor;
@@ -34,7 +35,7 @@ public class ActorService {
 
     //create an actor with name and birthdate and return it to controller
     @Transactional
-    public ActorResponseDTO create(ActorPatchDTO actorDTO) {
+    public ActorResponseDTO create(ActorPostDTO actorDTO) {
         Actor actor = new Actor();
         actor.setName(actorDTO.name());
         actor.setBirthdate(actorDTO.birthdate());

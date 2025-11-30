@@ -2,6 +2,7 @@ package com.lauri.kood.movieapi.controller;
 
 import com.lauri.kood.movieapi.PaginationValidator;
 import com.lauri.kood.movieapi.dto.ActorPatchDTO;
+import com.lauri.kood.movieapi.dto.ActorPostDTO;
 import com.lauri.kood.movieapi.dto.ActorResponseDTO;
 import com.lauri.kood.movieapi.dto.MovieResponseDTO;
 import com.lauri.kood.movieapi.service.ActorService;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 /*
@@ -67,7 +69,7 @@ public class ActorController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping//create a new listing in a database with new ID
-    public ActorResponseDTO createActor(@RequestBody @Valid ActorPatchDTO actorDto) {
+    public ActorResponseDTO createActor(@RequestBody @Valid ActorPostDTO actorDto) {
         return actorService.create(actorDto);
     }
 
@@ -77,7 +79,7 @@ public class ActorController {
     public ActorResponseDTO updateActor(@PathVariable Long id, @Valid @RequestBody ActorPatchDTO patch) {
         return actorService.updateActor(id, patch);
     }
-
+@Transactional
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")//should always update using ID but never expose ID to client.
     public void deleteActor(@PathVariable Long id, @RequestParam(defaultValue = "false") boolean force) {
