@@ -5,11 +5,13 @@ import com.lauri.kood.movieapi.dto.*;
 import com.lauri.kood.movieapi.entity.Genre;
 import com.lauri.kood.movieapi.repository.GenreRepository;
 import com.lauri.kood.movieapi.service.GenreService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,11 +33,15 @@ public class GenreController {
         this.genreService = genreService;
     }
 
-    @GetMapping//returns httpstatus 200 by default
+    @GetMapping//returns http status 200 by default
     public Page<GenreResponseDTO> findAll(@RequestParam(defaultValue = "0") int page,
-                                          @RequestParam(defaultValue = "99") int size) {
+                                          @RequestParam(defaultValue = "99") int size,
+                                          @RequestParam(required = false) String sortBy,
+                                          @RequestParam(required = false, defaultValue = "true") boolean ascending) {
+        //if ascending is true, then sort by ascending, otherwise sort by descending order.
+        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
         PaginationValidator.validate(page, size);
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         return genreService.findAll(pageable);
     }
@@ -56,7 +62,7 @@ public class GenreController {
 
     @ResponseStatus(HttpStatus.CREATED) //returns httpstatus 201
     @PostMapping
-    public GenreResponseDTO create(@RequestBody @Validated GenrePatchDTO genreDto) {
+    public GenreResponseDTO create(@RequestBody @Valid GenrePatchDTO genreDto) {
         return genreService.create(genreDto);
     }
 

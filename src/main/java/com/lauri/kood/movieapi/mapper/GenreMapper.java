@@ -8,7 +8,6 @@ public class GenreMapper {
         return new GenreResponseDTO(
                 genre.getId(),
                 genre.getName()
-                //genre.getMovies()
         );
     }
 }

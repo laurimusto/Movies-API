@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 /*
 @RequestMapping
@@ -37,57 +37,61 @@ public class ActorController {
     @GetMapping //get every actor from a database and also apply filters if needed.
     public Page<ActorResponseDTO> getAll(@RequestParam(required = false) String name,
                                          @RequestParam(defaultValue = "0") int page,
-                                         @RequestParam(defaultValue = "99") int size) {
-        PaginationValidator.validate(page, size);
-        Pageable pageable = PageRequest.of(page, size);
-        return actorService.getAll(name, pageable);
+                                         @RequestParam(defaultValue = "99") int size,
+                                         @RequestParam(required = false) String sortBy,
+                                         @RequestParam(required = false, defaultValue = "true") boolean ascending) {
+        //if ascending is true, then sort by ascending, otherwise sort by descending order.
+        Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+            PaginationValidator.validate(page, size);
+            Pageable pageable = PageRequest.of(page, size, sort);
+            return actorService.getAll(name, pageable);
+        }
+
+        @GetMapping("/search") //enables searching by keyword
+        public Page<ActorResponseDTO> searchByName (@RequestParam String name,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "99") int size){
+
+            PaginationValidator.validate(page, size);
+            Pageable pageable = PageRequest.of(page, size);
+            return actorService.getName(name, pageable);
+        }
+
+        @GetMapping("/{id}")//get Actor with corresponding ID from a database.
+        public ActorResponseDTO findById (@PathVariable Long id){
+            return actorService.findById(id);
+        }
+
+        @GetMapping("/{id}/movies") //return all movies where actor has appeared
+        public Page<MovieResponseDTO> getMoviesByActor (@PathVariable Long id,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "99") int size){
+            PaginationValidator.validate(page, size);
+            Pageable pageable = PageRequest.of(page, size);
+            return actorService.getMoviesByActor(id, pageable);
+        }
+
+        @ResponseStatus(HttpStatus.CREATED)
+        @PostMapping//create a new listing in a database with new ID
+        public ActorResponseDTO createActor (@RequestBody @Valid ActorPostDTO actorDto){
+            return actorService.create(actorDto);
+        }
+
+
+        @ResponseStatus(HttpStatus.OK)
+        @PatchMapping("/{id}")//should always update using ID but never expose ID to client.
+        public ActorResponseDTO updateActor (@PathVariable Long id, @Valid @RequestBody ActorPatchDTO patch){
+            return actorService.updateActor(id, patch);
+        }
+        @Transactional
+        @ResponseStatus(HttpStatus.NO_CONTENT)
+        @DeleteMapping("/{id}")//should always update using ID but never expose ID to client.
+        public void deleteActor (@PathVariable Long id,@RequestParam(defaultValue = "false") boolean force){
+            actorService.deleteActor(id, force);
+        }
+
+
     }
-
-    @GetMapping("/search") //enables searching by keyword
-    public Page<ActorResponseDTO> searchByName(@RequestParam String name,
-                                               @RequestParam(defaultValue = "0") int page,
-                                               @RequestParam(defaultValue = "99") int size) {
-
-        PaginationValidator.validate(page, size);
-        Pageable pageable = PageRequest.of(page, size);
-        return actorService.getName(name, pageable);
-    }
-
-    @GetMapping("/{id}")//get Actor with corresponding ID from a database.
-    public ActorResponseDTO findById(@PathVariable Long id) {
-        return actorService.findById(id);
-    }
-
-    @GetMapping("/{id}/movies") //return all movies where actor has appeared
-    public Page<MovieResponseDTO> getMoviesByActor(@PathVariable Long id,
-                                                   @RequestParam(defaultValue = "0") int page,
-                                                   @RequestParam(defaultValue = "99") int size) {
-        PaginationValidator.validate(page, size);
-        Pageable pageable = PageRequest.of(page, size);
-        return actorService.getMoviesByActor(id, pageable);
-    }
-
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping//create a new listing in a database with new ID
-    public ActorResponseDTO createActor(@RequestBody @Valid ActorPostDTO actorDto) {
-        return actorService.create(actorDto);
-    }
-
-
-    @ResponseStatus(HttpStatus.OK)
-    @PatchMapping("/{id}")//should always update using ID but never expose ID to client.
-    public ActorResponseDTO updateActor(@PathVariable Long id, @Valid @RequestBody ActorPatchDTO patch) {
-        return actorService.updateActor(id, patch);
-    }
-@Transactional
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{id}")//should always update using ID but never expose ID to client.
-    public void deleteActor(@PathVariable Long id, @RequestParam(defaultValue = "false") boolean force) {
-        actorService.deleteActor(id, force);
-    }
-
-
-}
 /*
 Implement controller classes: GenreController, MovieController, and ActorController
 Set up the following endpoints for each entity:

@@ -20,9 +20,8 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-
-    private ResponseEntity<ErrorResponseDTO> createErrorResponse( //helper to create response for exception.
-                                                                  HttpStatus status, String message) {
+    //helper to create response for exception.
+    private ResponseEntity<ErrorResponseDTO> createErrorResponse(HttpStatus status, String message) {
         return ResponseEntity
                 .status(status)
                 .body(new ErrorResponseDTO(status.value(), status.getReasonPhrase(), message));
@@ -35,21 +34,15 @@ public class GlobalExceptionHandler {
         return createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponseDTO> handleIllegalArgument(IllegalArgumentException e) {
-        return createErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
-    }
-
     // for handling "400 error"(Bad Request)
-    @ExceptionHandler({
+    @ExceptionHandler({IllegalArgumentException.class,
             InvalidDateException.class,
             InvalidDateFormatException.class,
             InvalidDurationException.class,
             InvalidReleaseYearException.class,
-
-    })
+            InvalidDateTimeParseException.class})
     public ResponseEntity<ErrorResponseDTO> handleBadRequest(Exception ex) {
-        return createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+        return createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -74,7 +67,6 @@ public class GlobalExceptionHandler {
         // return 400 with a short, clear parse error message
         return createErrorResponse(HttpStatus.BAD_REQUEST, "JSON parse error: " + message);
     }
-
 
 
     // Handles Spring's MethodArgumentNotValidException thrown when @Valid validation fails.

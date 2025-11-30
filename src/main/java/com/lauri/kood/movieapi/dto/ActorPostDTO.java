@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Past;
 import java.time.LocalDate;
 
 public record ActorPostDTO(
-        @NotNull
+
         @NotBlank
         String name,
         @NotNull

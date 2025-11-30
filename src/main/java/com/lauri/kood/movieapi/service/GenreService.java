@@ -89,8 +89,8 @@ public class GenreService {
                 .findById(id)
                 .orElseThrow(()
                         -> new ResourceNotFoundException("Can't find genre with id: " + id));
-        if (genreDto.name() != null) {
-            genre.setName(genreDto.name());//we might check for blank too but that may be the intention of the modifier - to leave it blank. otherwise we can use .isBlank()
+        if (genreDto.name() != null && !genreDto.name().isBlank()) {
+            genre.setName(genreDto.name());
         }
 
         Genre updatedGenre = genreRepository.save(genre);

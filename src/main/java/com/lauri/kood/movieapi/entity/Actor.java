@@ -11,7 +11,7 @@ import java.util.List;
 public class Actor {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //generates the values when created
     private Long id;
 
     @Column(nullable = false)

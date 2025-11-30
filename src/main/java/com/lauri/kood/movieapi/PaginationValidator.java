@@ -1,24 +1,5 @@
 package com.lauri.kood.movieapi;
 
-/**
- * Validator for pagination parameters.
- * <p>
- * Ensures that page number and page size values conform to application
- * constraints before creating {@link org.springframework.data.domain.Pageable} objects.
- * This validator enforces maximum page size limits and prevents negative values.
- * </p>
- * <p>
- * Validation rules:
- * <ul>
- *   <li>Page number must be non-negative (0-based indexing)</li>
- *   <li>Page size must be positive (at least 1)</li>
- *   <li>Page size must not exceed the maximum limit (100)</li>
- * </ul>
- * </p>
- *
- * @see org.springframework.data.domain.Pageable
- * @see org.springframework.data.domain.PageRequest
- */
 public class PaginationValidator {
 
     /**

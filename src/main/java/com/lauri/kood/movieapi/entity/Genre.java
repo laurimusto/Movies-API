@@ -10,7 +10,7 @@ import java.util.Set;
 public class Genre {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //generates the values when created
     private Long id;
 
     @Column(nullable = false)

@@ -10,7 +10,7 @@ import java.util.Set;
 @Entity
 public class Movie {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //generates the values when created
     private Long id;
 
     @Column(nullable = false)

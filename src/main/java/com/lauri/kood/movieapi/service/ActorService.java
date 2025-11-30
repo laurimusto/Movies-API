@@ -77,9 +77,9 @@ public class ActorService {
     public ActorResponseDTO updateActor(Long id, ActorPatchDTO patch) {
         Actor actor = actorRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("Actor with id " + id + " not found"));
-        if (patch.name() != null) {
+        if (patch.name() != null && !patch.name().isBlank()) {
             actor.setName(patch.name());
-        } //we might check for blank too but that may be the intention of the modifier - to leave it blank. isBlank() for that.
+        }
         if (patch.birthdate() != null) {
             actor.setBirthdate(patch.birthdate());
         }
