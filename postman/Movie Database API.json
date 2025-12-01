@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "1dc5678a-3fe0-4ca4-b4fe-7d5d9a8e8f02",
-		"name": "KMDB Movie API",
+		"name": "Movie Database API",
 		"description": "Complete API collection for KMDB Movie Database with movies, actors, and genres management",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "49516175"
@@ -16,7 +16,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/movies?page=0&size=20",
+							"raw": "http://localhost:8080/api/movies?page=0&size=20&sortBy=releaseYear&ascending=true",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -30,10 +30,6 @@
 								{
 									"key": "page",
 									"value": "0"
-								},
-								{
-									"key": "size",
-									"value": "20"
 								},
 								{
 									"key": "genre",
@@ -54,6 +50,18 @@
 									"key": "title",
 									"value": "inception",
 									"disabled": true
+								},
+								{
+									"key": "size",
+									"value": "20"
+								},
+								{
+									"key": "sortBy",
+									"value": "releaseYear"
+								},
+								{
+									"key": "ascending",
+									"value": "true"
 								}
 							]
 						}
@@ -142,6 +150,82 @@
 								{
 									"key": "size",
 									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sort movies by release year",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/movies?page=0&size=20&sortBy=releaseYear&ascending=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"movies"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								},
+								{
+									"key": "sortBy",
+									"value": "releaseYear"
+								},
+								{
+									"key": "ascending",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sort movies by ID ascending",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/movies?page=0&size=20&sortBy=id&ascending=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"movies"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								},
+								{
+									"key": "sortBy",
+									"value": "id"
+								},
+								{
+									"key": "ascending",
+									"value": "true"
 								}
 							]
 						}
@@ -384,6 +468,44 @@
 					"response": []
 				},
 				{
+					"name": "Sort by ascending names",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/actors?page=0&size=5&sortBy=name&ascending=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"actors"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "5"
+								},
+								{
+									"key": "sortBy",
+									"value": "name"
+								},
+								{
+									"key": "ascending",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Create Actor",
 					"request": {
 						"method": "POST",
@@ -395,7 +517,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Keanu Reeves2121\",\n  \"birthdate\": \"1964-02-02\"\n}"
+							"raw": "{\n  \"name\": \"New name created\",\n  \"birthdate\": \"2700-02-02\"\n}"
 						},
 						"url": {
 							"raw": "http://localhost:8080/api/actors",
@@ -561,7 +683,46 @@
 							"path": [
 								"api",
 								"genres",
-								"1"
+								"1",
+								"movies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sort by ascending genres",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/api/genres?page=0&size=5&sortBy=name&ascending=true",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"api",
+								"genres"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "5"
+								},
+								{
+									"key": "sortBy",
+									"value": "name"
+								},
+								{
+									"key": "ascending",
+									"value": "true"
+								}
 							]
 						}
 					},
@@ -579,7 +740,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"name\": \"Documentary\"\n}"
+							"raw": "{\n\"name\": \"new genre\"\n}"
 						},
 						"url": {
 							"raw": "http://localhost:8080/api/genres",
