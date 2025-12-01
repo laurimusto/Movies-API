@@ -38,7 +38,7 @@ public class MovieController {
             @RequestParam(required = false) String title,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "99") int size,
-            @RequestParam(required = false) String sortBy,
+            @RequestParam(defaultValue = "title", required = false) String sortBy,
             @RequestParam(defaultValue = "true") boolean ascending) {
         //if ascending is true, then sort by ascending, otherwise sort by descending order.
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();

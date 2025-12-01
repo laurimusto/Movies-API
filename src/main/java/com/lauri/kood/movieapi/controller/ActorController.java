@@ -38,7 +38,7 @@ public class ActorController {
     public Page<ActorResponseDTO> getAll(@RequestParam(required = false) String name,
                                          @RequestParam(defaultValue = "0") int page,
                                          @RequestParam(defaultValue = "99") int size,
-                                         @RequestParam(required = false) String sortBy,
+                                         @RequestParam(defaultValue = "name", required = false) String sortBy,
                                          @RequestParam(required = false, defaultValue = "true") boolean ascending) {
         //if ascending is true, then sort by ascending, otherwise sort by descending order.
         Sort sort = ascending ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
