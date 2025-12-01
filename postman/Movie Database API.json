@@ -552,7 +552,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:8080/api/genres/1",
+							"raw": "http://localhost:8080/api/genres/1/movies",
 							"protocol": "http",
 							"host": [
 								"localhost"

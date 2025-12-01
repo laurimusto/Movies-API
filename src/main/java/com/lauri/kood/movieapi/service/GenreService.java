@@ -60,7 +60,7 @@ public class GenreService {
 
     public Page<MovieResponseDTO> getMoviesByGenres(Long id, Pageable pageable) {
         Genre genre = genreRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException("Actor with id " + id + " not found"));
+                new ResourceNotFoundException("Genre with id " + id + " not found."));
         return movieRepository.findByGenres_Id(id, pageable)
                 .map(MovieMapper::toMovieResponseDTO);
     }
