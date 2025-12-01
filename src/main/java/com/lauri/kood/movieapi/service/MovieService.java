@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.LocalDate;
+import java.time.Year;
 import java.util.List;
 
 @Service
@@ -166,7 +168,6 @@ public class MovieService {
             validateDuration(patch.duration());
             movie.setDuration(patch.duration());
         }
-
         if (patch.releaseYear() != null) { //release year must be between 1888 and now.
             validateYear(patch.releaseYear());
             movie.setReleaseYear(patch.releaseYear());
@@ -193,9 +194,9 @@ public class MovieService {
 
     //for handling associations of movie-genre
     private void handleGenreUpdates(Movie movie, MoviePatchDTO dto) {
-        if (dto.addGenreIds() != null && !dto.addActorIds().isEmpty()) {
-            List<Genre> genresToAdd = genreRepository.findAllById(dto.addActorIds());
-            if (genresToAdd.size() != dto.addActorIds().size()) {
+        if (dto.addGenreIds() != null && !dto.addGenreIds().isEmpty()) {
+            List<Genre> genresToAdd = genreRepository.findAllById(dto.addGenreIds());
+            if (genresToAdd.size() != dto.addGenreIds().size()) {
                 throw new ResourceNotFoundException("One or more genre IDs not found");
             }
             movie.getGenres().addAll(genresToAdd);

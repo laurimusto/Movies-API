@@ -43,7 +43,7 @@ public class GenreController {
         PaginationValidator.validate(page, size);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        return genreService.findAll(pageable);
+        return genreService.getAll(pageable);
     }
 
     @GetMapping("/{id}") //returns httpstatus 200 by default

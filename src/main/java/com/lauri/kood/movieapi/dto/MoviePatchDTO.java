@@ -7,7 +7,6 @@ import java.time.Year;
 import java.util.Set;
 
 public record MoviePatchDTO(String title,
-                            @Past
                             Integer releaseYear,
                             @Positive
                             Integer duration,

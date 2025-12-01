@@ -37,7 +37,7 @@ public class GenreService {
         return GenreMapper.toGenreResponseDto(savedGenre);
     }
 
-    public Page<GenreResponseDTO> findAll(Pageable pageable) {
+    public Page<GenreResponseDTO> getAll(Pageable pageable) {
         return genreRepository.findAll(pageable)
                 .map(genre
                         -> new GenreResponseDTO(genre.getId(), genre.getName())); //retrieve all genres from database
