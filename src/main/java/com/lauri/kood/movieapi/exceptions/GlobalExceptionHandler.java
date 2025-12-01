@@ -28,14 +28,14 @@ public class GlobalExceptionHandler {
     }
 
     //for handling "404 error"(Not Found)
-    @ExceptionHandler({ResourceNotFoundException.class, ResourceInUseException.class})
-//which Exceptions we are catching.
+    @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleNotFound(RuntimeException ex) {
         return createErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     // for handling "400 error"(Bad Request)
-    @ExceptionHandler({IllegalArgumentException.class,
+    @ExceptionHandler({ResourceInUseException.class, //which Exceptions we are catching.
+            IllegalArgumentException.class,
             InvalidDateException.class,
             InvalidDateFormatException.class,
             InvalidDurationException.class,
