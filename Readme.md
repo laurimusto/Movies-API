@@ -6,7 +6,7 @@ A RESTful API for managing a movie database for a local film society, built with
 
 **Lauri Musto**  
 Email: [Laurimusto@gmail.com](mailto:Laurimusto@gmail.com)  
-GitHub: [github.com/lauri](https://github.com/lauri)
+GitHub: [github.com/laurimusto](https://github.com/laurimusto)
 
 ---
 
